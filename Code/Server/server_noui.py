@@ -62,7 +62,7 @@ class myapp():
             self.power.start()
             
         elif self.serverup==True:
-            sellf.serverup=False
+            self.serverup=False
             self.TCP_Server.tcp_Flag = False
             try:
                 stop_thread(self.ReadData)
@@ -97,13 +97,16 @@ if __name__ == '__main__':
                         PWM.setMotorModel(-1500,-1500,2000,2000)
                     elif event.code == 106:
                         PWM.setMotorModel(2000,2000,-1500,-1500)
+                    elif event.code == 57:
+                        myshow.on_pushButton()
                     elif event.code == 28:
                         buzzer.run('1')
                     else:
                         print(categorize(event))
                 elif event.value == 2: # Holding - long press processing
-                    if event.code == 0: # long press play/pause button
+                    if event.code == 57: # long press play/pause button
                         sdcount = sdcount + 1
-                        print sdcount
+			if sdcount > 30:
+			   os.system("sudo poweroff")
     except KeyboardInterrupt:
         myshow.close()
