@@ -9,7 +9,7 @@ class Servo:
     def setServoPwm(self,channel,angle,error=10):
         angle=int(angle)
         if channel=='0':
-            self.PwmServo.setServoPulse(8,2500-int((angle+error)/0.09))
+            self.PwmServo.setServoPulse(8,2500-int((angle+error+15)/0.09))
         elif channel=='1':
             self.PwmServo.setServoPulse(9,500+int((angle+error)/0.09))
         elif channel=='2':
