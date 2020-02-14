@@ -79,6 +79,7 @@ if __name__ == '__main__':
     print(dev);
     PWM=Motor()
     buzzer = Buzzer()
+    time.sleep(2)
     myshow=myapp()
     sdcount = 0
     try:
