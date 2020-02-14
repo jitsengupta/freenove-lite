@@ -42,7 +42,8 @@ class Server:
         return socket.inet_ntoa(fcntl.ioctl(s.fileno(), 0x8915, struct.pack('256s',
                                 "wlan0"[:15]))[20:24])
     def StartTcpServer(self):
-        HOST=str(self.get_interface_ip())
+        # HOST=str(self.get_interface_ip())
+        HOST='0.0.0.0' # Can I bind to a catch-all address
         self.server_socket1 = socket.socket()
         self.server_socket1.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEPORT,1)
         self.server_socket1.bind((HOST, 5000))
@@ -79,8 +80,8 @@ class Server:
         try:
             with picamera.PiCamera() as camera:
                 camera.resolution = (400,300)      # pi camera resolution
-                camera.framerate = 30               # 15 frames/sec
-                time.sleep(2)                       # give 2 secs for camera to initilize
+                camera.framerate = 30              # 15 frames/sec
+                time.sleep(2)                      # give 2 secs for camera to initilize
                 start = time.time()
                 stream = io.BytesIO()
                 # send jpeg format video stream
