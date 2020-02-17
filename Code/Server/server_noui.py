@@ -12,6 +12,7 @@ from evdev import InputDevice, categorize, ecodes
 from select import select
 from Motor import *
 from Buzzer import *
+from Servo import *
 
 SPACE = 57
 OK = 28
@@ -25,6 +26,11 @@ PLAY = 164
 PREV = 165
 NEXT = 163
 CONFIG = 171
+
+ARMSTART = 0
+ARMEND = 150
+HANDSTART = 0
+HANDEND = 150
 
 class myapp():
     
@@ -94,6 +100,11 @@ if __name__ == '__main__':
     PWM=Motor()
     buzzer = Buzzer()
     myshow=myapp()
+    myservo=Servo()
+    curarmangle = ARMSTART
+    curhandangle = HANDSTART
+    myservo.setServoPwm('2',curarmangle)
+    myservo.setServoPwm('3',curhandangle)
     sdcount = 0
     try:
         while True:
@@ -118,16 +129,6 @@ if __name__ == '__main__':
                             myshow.on_pushButton()
                         elif event.code == OK:
                             buzzer.run('1')
-                        elif event.code == VUP:
-                            print("Arm up!")
-                        elif event.code == VDOWN:
-                            print("Arm down!")
-                        elif event.code == PLAY:
-                            print("Reset arm")
-                        elif event.code == PREV:
-                            print("Arm open")
-                        elif event.code == NEXT:
-                            print("Arm close")
                         elif event.code == CONFIG:
                             print("Headlights?")
                         else:
@@ -135,6 +136,32 @@ if __name__ == '__main__':
                     elif event.value == 2: # Holding - long press processing
                         if event.code == 57: # long press play/pause button
                             sdcount = sdcount + 1
+                        elif event.code == VUP:
+                            print("Arm up!")
+                            if (curarmangle >= ARMSTART + 5):
+                                curarmangle = curarmangle - 5
+                                myservo.setServoPwm('2', curarmangle)
+                        elif event.code == VDOWN:
+                            print("Arm down!")
+                            if (curarmangle <= ARMEND - 5):
+                                curarmangle = curarmangle + 5
+                                myservo.setServoPwm('2', curarmangle)
+                        elif event.code == PLAY:
+                            print("Reset arm")
+                            curarmangle = ARMSTART
+                            curhandangle = HANDSTART
+                            myservo.setServoPwm('2',curarmangle)
+                            myservo.setServoPwm('3',curhandangle)
+                        elif event.code == PREV:
+                            print("Arm open")
+                            if (curhandangle <= HANDEND - 5):
+                                curhandangle = curarmangle + 5
+                                myservo.setServoPwm('3', curhandangle)
+                        elif event.code == NEXT:
+                            print("Arm close")
+                            if (curhandangle >= HANDSTART + 5):
+                                curhandangle = curhandangle - 5
+                                myservo.setServoPwm('3', curhandangle)
     			if sdcount > 30:
     			   os.system("sudo poweroff")
     except KeyboardInterrupt:
