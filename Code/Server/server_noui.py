@@ -138,9 +138,7 @@ if __name__ == '__main__':
                                 curarmangle = curarmangle + 5
                                 myservo.setServoPwm('3', curarmangle)
                         elif event.code == PLAY:
-                            curarmangle = ARMSTART
-                            curhandangle = (HANDSTART + HANDEND) / 2
-                            myservo.setServoPwm('3',curarmangle)
+                            curhandangle = HANDEND
                             myservo.setServoPwm('4',curhandangle)
                         elif event.code == PREV:
                             if curhandangle >= HANDSTART + 5:
