@@ -13,6 +13,7 @@ from select import select
 from Motor import *
 from Buzzer import *
 from servo import *
+from gpiozero import LED
 
 SPACE = 57
 OK = 28
@@ -27,8 +28,8 @@ PREV = 165
 NEXT = 163
 CONFIG = 171
 
-ARMSTART = 10
-ARMEND = 150
+ARMSTART = 40 
+ARMEND = 155
 HANDSTART = 10
 HANDEND = 90
 
@@ -38,15 +39,7 @@ class myapp():
         self.serverup=False
         self.TCP_Server=Server()
         print "Initializing..."
-        print "Open TCP"
-        self.TCP_Server.StartTcpServer()
-        self.ReadData=Thread(target=self.TCP_Server.readdata)
-        self.SendVideo=Thread(target=self.TCP_Server.sendvideo)
-        self.power=Thread(target=self.TCP_Server.Power)
-        self.SendVideo.start()
-        self.ReadData.start()
-        self.power.start()
-        self.serverup = True
+	self.on_pushButton()
                         
     def close(self):
         print "Closing down..."
@@ -90,7 +83,7 @@ class myapp():
             
             self.TCP_Server.StopTcpServer()
             self.serverup=False
-            print "Close TCP" 
+            print "Close TCP"
             
 if __name__ == '__main__':
     devices = map(InputDevice, ('/dev/input/event0','/dev/input/event3'))
@@ -101,6 +94,8 @@ if __name__ == '__main__':
     buzzer = Buzzer()
     myshow=myapp()
     myservo=Servo()
+    headlight=LED(26)
+    headlightstatus=False
     curarmangle = ARMSTART
     curhandangle = (HANDSTART + HANDEND) / 2
     myservo.setServoPwm('3',curarmangle)
@@ -128,8 +123,8 @@ if __name__ == '__main__':
                         elif event.code == SPACE:
                             myshow.on_pushButton()
                         elif event.code == OK:
-                            buzzer.run('1')
-                        elif event.code == VUP:
+                            buzzer.run('1') 
+			elif event.code == VUP:
                             if curarmangle >= ARMSTART + 5:
                                 curarmangle = curarmangle - 5
                                 myservo.setServoPwm('3', curarmangle)
@@ -149,7 +144,12 @@ if __name__ == '__main__':
                                 curhandangle = curhandangle + 5
                                 myservo.setServoPwm('4', curhandangle)
                         elif event.code == CONFIG:
-                            print("Headlights?")
+			    if headlightstatus:
+				headlightstatus=False
+				headlight.off()
+			    else:
+				headlightstatus=True
+				headlight.on()
                         else:
                             print(categorize(event))
                     elif event.value == 2: # Holding - long press processing
