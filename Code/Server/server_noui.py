@@ -95,7 +95,6 @@ if __name__ == '__main__':
     myshow=myapp()
     myservo=Servo()
     headlight=LED(26)
-    headlightstatus=False
     curarmangle = ARMSTART
     curhandangle = (HANDSTART + HANDEND) / 2
     myservo.setServoPwm('3',curarmangle)
@@ -124,7 +123,7 @@ if __name__ == '__main__':
                             myshow.on_pushButton()
                         elif event.code == OK:
                             buzzer.run('1') 
-			elif event.code == VUP:
+                        elif event.code == VUP:
                             if curarmangle >= ARMSTART + 5:
                                 curarmangle = curarmangle - 5
                                 myservo.setServoPwm('3', curarmangle)
@@ -144,12 +143,7 @@ if __name__ == '__main__':
                                 curhandangle = curhandangle + 5
                                 myservo.setServoPwm('4', curhandangle)
                         elif event.code == CONFIG:
-			    if headlightstatus:
-				headlightstatus=False
-				headlight.off()
-			    else:
-				headlightstatus=True
-				headlight.on()
+                				headlight.toggle()
                         else:
                             print(categorize(event))
                     elif event.value == 2: # Holding - long press processing
