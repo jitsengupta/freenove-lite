@@ -38,9 +38,11 @@ class TailLight:
 
     def loadValues(self):
         self.green.value = self.lgv 
-        maybe(self.rightgreen).value = self.rgv
+        if self.rightgreen is not null:
+            self.rightgreen.value = self.rgv
         self.red.value = self.lrv
-        maybe(self.rightred).value = self.rrv 
+        if self.rightred is not null:
+            self.rightgreen.value = self.rrv 
                 
     def rightblink(self):
         # Let's save the current stage to local values
@@ -92,9 +94,3 @@ if __name__=='__main__':
     print("Flash")
     tl.flash()
     time.sleep(2)
-    
-
-
-        
-    
-
