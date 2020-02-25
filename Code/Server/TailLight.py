@@ -38,13 +38,13 @@ class TailLight:
 
     def loadValues(self):
         self.green.value = self.lgv 
-        if self.rightgreen is not null:
+        if self.rightgreen is not None:
             self.rightgreen.value = self.rgv
         self.red.value = self.lrv
-        if self.rightred is not null:
-            self.rightgreen.value = self.rrv 
+        if self.rightred is not None:
+            self.rightred.value = self.rrv 
                 
-    def rightblink(self):
+    def rightblink3(self):
         # Let's save the current stage to local values
         # Then blink the left red and leave the right red on
         # Maybe just blink 3 times then put things back how
@@ -54,21 +54,24 @@ class TailLight:
         maybe(self.rightred).blink(0.5, 0.5, 3, False)
         self.loadValues()
 
-    def leftblink(self):
+    def leftblink3(self):
         self.saveValues()
         self.bothred()
         self.red.blink(0.5, 0.5, 3, False)
         self.loadValues()
     
+    def leftblink(self):
+        self.bothred()
+        self.red.blink(0.5, 0.5)
+    
+    def rightblink(self):
+	self.bothred()
+        maybe(self.rightred).blink(0.5,0.5)
+
     def flash(self):
-        self.saveValues()
-        for foo in range(1,3):
-            self.bothred()
-            time.sleep(0.5)
-            self.off()
-            time.sleep(0.5)
-        self.loadValues()
-        pass
+	self.bothred()
+        self.red.blink(0.5, 0.5)
+        maybe(self.rightred).blink(0.5,0.5)
     
     def off(self):
         self.green.off()
@@ -89,8 +92,11 @@ if __name__=='__main__':
     time.sleep(3)
     print("Left blink")
     tl.leftblink()
+    time.sleep(3)
     print("Right blink")
     tl.rightblink()
+    time.sleep(3)
+
     print("Flash")
     tl.flash()
-    time.sleep(2)
+    time.sleep(4)
