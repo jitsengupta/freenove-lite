@@ -34,13 +34,20 @@ ARMEND = 155
 HANDSTART = 10
 HANDEND = 90
 
+HEADLIGHTPIN = 25
+LEFTGREENPIN = 26
+RIGHTGREENPIN = 26
+LEFTREDPIN = 20
+RIGHTREDPIN = 21
+
 class myapp():
     
-    def __init__(self):
+    def __init__(self, motor=None, headlight=None, taillight = None):
         self.serverup=False
-        self.TCP_Server=Server()
+        self.taillight = taillight
+        self.TCP_Server=Server(motor, headlight, taillight, buzzer)
         print "Initializing..."
-	self.on_pushButton()
+        self.on_pushButton()
                         
     def close(self):
         print "Closing down..."
@@ -54,6 +61,7 @@ class myapp():
             self.TCP_Server.server_socket.shutdown(2)
             self.TCP_Server.server_socket1.shutdown(2)
             self.TCP_Server.StopTcpServer()
+            maybe(self.taillight).off()
         except:
             pass
         self.serverup = False
@@ -71,6 +79,7 @@ class myapp():
             self.SendVideo.start()
             self.ReadData.start()
             self.power.start()
+            maybe(self.taillight).bothred()
             self.serverup = True
             
         elif self.serverup==True:
@@ -84,6 +93,7 @@ class myapp():
             
             self.TCP_Server.StopTcpServer()
             self.serverup=False
+            maybe(self.taillight).off()
             print "Close TCP"
             
 if __name__ == '__main__':
@@ -91,17 +101,16 @@ if __name__ == '__main__':
     devices = {dev.fd: dev for dev in devices}
     for dev in devices.values(): 
          print(dev)
-    PWM=Motor()
     buzzer = Buzzer()
-    myshow=myapp()
     myservo=Servo()
-    #headlight=LED(26)
     curarmangle = ARMSTART
     curhandangle = (HANDSTART + HANDEND) / 2
     myservo.setServoPwm('3',curarmangle)
     myservo.setServoPwm('4',curhandangle)
-    tail = TailLight(26,21,20,21)
-    tail.bothred()
+    headlight=LED(HEADLIGHTPIN)
+    taillight = TailLight(LEFTREDPIN, LEFTGREENPIN, RIGHTREDPIN, RIGHTGREENPIN)
+    PWM=Motor(taillight)
+    myshow=myapp(PWM, headlight, taillight, buzzer)
     
     sdcount = 0
     try:
@@ -113,7 +122,7 @@ if __name__ == '__main__':
                     if event.value == 0: # release stop
                         PWM.setMotorModel(0,0,0,0)
                         buzzer.run('0')
-			tail.bothred()
+                        # tail.bothred()
                         sdcount = 0
                     elif event.value == 1: # press - start
                         if event.code == UP:
@@ -121,10 +130,10 @@ if __name__ == '__main__':
                         elif event.code == DOWN:
                             PWM.setMotorModel(-1000,-1000,-1000,-1000)
                         elif event.code == LEFT:
-			    tail.leftblink()
+                            # tail.leftblink() Given the change in motor, I don't think we need this now.
                             PWM.setMotorModel(-1500,-1500,2000,2000)
                         elif event.code == RIGHT:
-			    tail.rightblink()
+                            # tail.rightblink()
                             PWM.setMotorModel(2000,2000,-1500,-1500)
                         elif event.code == SPACE:
                             myshow.on_pushButton()

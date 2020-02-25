@@ -2,21 +2,15 @@ import time
 from pymaybe import maybe
 from gpiozero import LED
 
+
 class TailLight:
     
     def __init__(self, leftredpin, leftgreenpin, rightredpin, rightgreenpin):
-        self.leftredpin = leftredpin
-        self.leftgreenpin = leftgreenpin
-        self.rightredpin = rightredpin
-        self.rightgreenpin = rightgreenpin
         self.red = LED(leftredpin)
         self.green = LED(leftgreenpin)
         self.rightgreen = LED(rightgreenpin) if rightgreenpin != leftgreenpin else None
         self.rightred = LED(rightredpin) if rightredpin != leftredpin else None
-        self.lgv = self.green.value
-        self.rgv = maybe(self.rightgreen).value
-        self.lrv = self.red.value
-        self.rrv = maybe(self.rightred).value
+        self.saveValues()
         
     def bothred(self):
         self.green.off()
@@ -65,22 +59,23 @@ class TailLight:
         self.red.blink(0.5, 0.5)
     
     def rightblink(self):
-	self.bothred()
-        maybe(self.rightred).blink(0.5,0.5)
+        self.bothred()
+        maybe(self.rightred).blink(0.5, 0.5)
 
     def flash(self):
-	self.bothred()
+        self.bothred()
         self.red.blink(0.5, 0.5)
-        maybe(self.rightred).blink(0.5,0.5)
+        maybe(self.rightred).blink(0.5, 0.5)
     
     def off(self):
         self.green.off()
         self.red.off()
         maybe(self.rightgreen).off()
         maybe(self.rightred).off()
+
             
-if __name__=='__main__':
-    tl = TailLight(26,21,20,21)
+if __name__ == '__main__':
+    tl = TailLight(26, 21, 20, 21)
     print("Red on")
     tl.bothred()
     time.sleep(3)

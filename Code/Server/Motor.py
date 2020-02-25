@@ -1,9 +1,13 @@
 import time
 from PCA9685 import PCA9685
+from pymaybe import maybe
+
 class Motor:
-    def __init__(self):
+    def __init__(self, tail=None):
         self.pwm = PCA9685(0x40, debug=True)
         self.pwm.setPWMFreq(50)
+        self.taillight = tail
+        
     def duty_range(self,duty1,duty2,duty3,duty4):
         if duty1>4095:
             duty1=4095
@@ -74,6 +78,13 @@ class Motor:
         self.left_Lower_Wheel(-duty2)
         self.right_Upper_Wheel(-duty3)
         self.right_Lower_Wheel(-duty4)
+        
+        if duty1 > 0 and duty2 > 0 and dute3 < 0 and duty4 < 0:
+            (maybe(self.taillight)).leftblink()
+        elif duty1 < 0 and duty2 < 0 and dute3 > 0 and duty4 > 0:
+            (maybe(self.taillight)).rightblink()
+        else:
+            (maybe(self.taillight)).bothred()
             
             
 PWM=Motor()          

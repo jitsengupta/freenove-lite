@@ -22,15 +22,17 @@ from threading import Thread
 from Command import COMMAND as cmd
 
 class Server:   
-    def __init__(self):
-        self.PWM=Motor()
+    def __init__(self, motor=None, headlight=None, taillight=None, buzzer=None):
+        self.PWM=Motor() if motor is None else motor
         self.servo=Servo()
         self.led=Led()
         self.ultrasonic=Ultrasonic()
-        self.buzzer=Buzzer()
+        self.buzzer=Buzzer() if buzzer is None else buzzer
         self.adc=Adc()
         self.light=Light()
         self.infrared=Line_Tracking()
+        self.headlight = headlight
+        self.taillight = taillight
         self.tcp_Flag = True
         self.sonic=False
         self.Light=False
@@ -129,7 +131,9 @@ class Server:
             try:
                 self.connection1,self.client_address1 = self.server_socket1.accept()
                 print "Client connection successful !"
+                maybe(self.taillight).bothgreen()
             except:
+                maybe(self.taillight).bothred()
                 print "Client connect failed"
             restCmd=""
             self.server_socket1.close()
