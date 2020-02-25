@@ -14,6 +14,7 @@ from Motor import *
 from Buzzer import *
 from servo import *
 from gpiozero import LED
+from TailLight import TailLight
 
 SPACE = 57
 OK = 28
@@ -94,11 +95,14 @@ if __name__ == '__main__':
     buzzer = Buzzer()
     myshow=myapp()
     myservo=Servo()
-    headlight=LED(26)
+    #headlight=LED(26)
     curarmangle = ARMSTART
     curhandangle = (HANDSTART + HANDEND) / 2
     myservo.setServoPwm('3',curarmangle)
     myservo.setServoPwm('4',curhandangle)
+    tail = TailLight(26,21,20,21)
+    tail.bothred()
+    
     sdcount = 0
     try:
         while True:
@@ -109,6 +113,7 @@ if __name__ == '__main__':
                     if event.value == 0: # release stop
                         PWM.setMotorModel(0,0,0,0)
                         buzzer.run('0')
+			tail.bothred()
                         sdcount = 0
                     elif event.value == 1: # press - start
                         if event.code == UP:
@@ -116,8 +121,10 @@ if __name__ == '__main__':
                         elif event.code == DOWN:
                             PWM.setMotorModel(-1000,-1000,-1000,-1000)
                         elif event.code == LEFT:
+			    tail.leftblink()
                             PWM.setMotorModel(-1500,-1500,2000,2000)
                         elif event.code == RIGHT:
+			    tail.rightblink()
                             PWM.setMotorModel(2000,2000,-1500,-1500)
                         elif event.code == SPACE:
                             myshow.on_pushButton()
@@ -143,7 +150,8 @@ if __name__ == '__main__':
                                 curhandangle = curhandangle + 5
                                 myservo.setServoPwm('4', curhandangle)
                         elif event.code == CONFIG:
-                				headlight.toggle()
+                		#headlight.toggle()
+				pass
                         else:
                             print(categorize(event))
                     elif event.value == 2: # Holding - long press processing
