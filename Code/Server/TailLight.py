@@ -14,9 +14,9 @@ class TailLight:
         self.rightgreen = LED(rightgreenpin) if rightgreenpin != leftgreenpin else None
         self.rightred = LED(rightredpin) if rightredpin != leftredpin else None
         self.lgv = self.green.value
-        self.rgv = self.rightgreen.value
+        self.rgv = maybe(self.rightgreen).value
         self.lrv = self.red.value
-        self.rrv = self.rightred.value
+        self.rrv = maybe(self.rightred).value
         
     def bothred(self):
         self.green.off()
@@ -32,15 +32,15 @@ class TailLight:
     
     def saveValues(self):
         self.lgv = self.green.value
-        self.rgv = self.rightgreen.value
+        self.rgv = maybe(self.rightgreen).value
         self.lrv = self.red.value
-        self.rrv = self.rightred.value
+        self.rrv = maybe(self.rightred).value
 
     def loadValues(self):
         self.green.value = self.lgv 
-        self.rightgreen.value = self.rgv
+        maybe(self.rightgreen).value = self.rgv
         self.red.value = self.lrv
-        self.rightred.value = self.rrv 
+        maybe(self.rightred).value = self.rrv 
                 
     def rightblink(self):
         # Let's save the current stage to local values
@@ -75,7 +75,7 @@ class TailLight:
         maybe(self.rightred).off()
             
 if __name__=='__main__':
-    tl = TailLight(20,21,26,21)
+    tl = TailLight(26,21,20,21)
     print("Red on")
     tl.bothred()
     time.sleep(3)
@@ -91,6 +91,7 @@ if __name__=='__main__':
     tl.rightblink()
     print("Flash")
     tl.flash()
+    time.sleep(2)
     
 
 
