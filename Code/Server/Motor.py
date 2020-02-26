@@ -79,9 +79,9 @@ class Motor:
         self.right_Upper_Wheel(-duty3)
         self.right_Lower_Wheel(-duty4)
         
-        if duty1 > 0 and duty2 > 0 and dute3 < 0 and duty4 < 0:
+        if duty1 > 0 and duty2 > 0 and duty3 < 0 and duty4 < 0:
             (maybe(self.taillight)).leftblink()
-        elif duty1 < 0 and duty2 < 0 and dute3 > 0 and duty4 > 0:
+        elif duty1 < 0 and duty2 < 0 and duty3 > 0 and duty4 > 0:
             (maybe(self.taillight)).rightblink()
         else:
             (maybe(self.taillight)).bothred()

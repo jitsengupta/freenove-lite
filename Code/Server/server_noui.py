@@ -34,15 +34,15 @@ ARMEND = 155
 HANDSTART = 10
 HANDEND = 90
 
-HEADLIGHTPIN = 25
-LEFTGREENPIN = 26
-RIGHTGREENPIN = 26
-LEFTREDPIN = 20
-RIGHTREDPIN = 21
+HEADLIGHTPIN = 16
+LEFTGREENPIN = 21
+RIGHTGREENPIN = 21
+LEFTREDPIN = 26
+RIGHTREDPIN = 20
 
 class myapp():
     
-    def __init__(self, motor=None, headlight=None, taillight = None):
+    def __init__(self, motor=None, headlight=None, taillight = None, buzzer = None):
         self.serverup=False
         self.taillight = taillight
         self.TCP_Server=Server(motor, headlight, taillight, buzzer)
@@ -61,7 +61,6 @@ class myapp():
             self.TCP_Server.server_socket.shutdown(2)
             self.TCP_Server.server_socket1.shutdown(2)
             self.TCP_Server.StopTcpServer()
-            maybe(self.taillight).off()
         except:
             pass
         self.serverup = False
@@ -79,7 +78,6 @@ class myapp():
             self.SendVideo.start()
             self.ReadData.start()
             self.power.start()
-            maybe(self.taillight).bothred()
             self.serverup = True
             
         elif self.serverup==True:
@@ -93,7 +91,6 @@ class myapp():
             
             self.TCP_Server.StopTcpServer()
             self.serverup=False
-            maybe(self.taillight).off()
             print "Close TCP"
             
 if __name__ == '__main__':
@@ -120,10 +117,11 @@ if __name__ == '__main__':
               for event in devices[fd].read():
                 if event.type == ecodes.EV_KEY:
                     if event.value == 0: # release stop
-                        PWM.setMotorModel(0,0,0,0)
-                        buzzer.run('0')
-                        # tail.bothred()
-                        sdcount = 0
+			if event.code != 57:
+                            PWM.setMotorModel(0,0,0,0)
+                            buzzer.run('0')
+                            # tail.bothred()
+                            sdcount = 0
                     elif event.value == 1: # press - start
                         if event.code == UP:
                             PWM.setMotorModel(1000,1000,1000,1000)      
@@ -159,8 +157,7 @@ if __name__ == '__main__':
                                 curhandangle = curhandangle + 5
                                 myservo.setServoPwm('4', curhandangle)
                         elif event.code == CONFIG:
-                		#headlight.toggle()
-				pass
+                		headlight.toggle()
                         else:
                             print(categorize(event))
                     elif event.value == 2: # Holding - long press processing

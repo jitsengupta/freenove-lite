@@ -55,10 +55,11 @@ class Server:
         self.server_socket.bind((HOST, 8000))              
         self.server_socket.listen(1)
         print('Server address: '+HOST)
-        
+        maybe(self.taillight).bothred() 
         
     def StopTcpServer(self):
         try:
+	    maybe(self.taillight).off()
             self.connection.close()
             self.connection1.close()
         except Exception ,  e:
@@ -133,7 +134,6 @@ class Server:
                 print "Client connection successful !"
                 maybe(self.taillight).bothgreen()
             except:
-                maybe(self.taillight).bothred()
                 print "Client connect failed"
             restCmd=""
             self.server_socket1.close()

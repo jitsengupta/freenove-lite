@@ -13,6 +13,7 @@ class TailLight:
         self.saveValues()
         
     def bothred(self):
+	#traceback.print_stack(file=sys.stdout)
         self.green.off()
         maybe(self.rightgreen).off()
         self.red.on()
