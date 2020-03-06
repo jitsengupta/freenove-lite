@@ -3,6 +3,7 @@ import os
 import socket
 import struct
 import time
+import threading
 import picamera
 import sys,getopt
 from threading import Thread
@@ -12,9 +13,12 @@ from evdev import InputDevice, categorize, ecodes
 from select import select
 from Motor import *
 from Buzzer import *
+from Ultrasonic import *
+from Adc import *
 from servo import *
 from gpiozero import LED
 from TailLight import TailLight
+from builtins import True
 
 SPACE = 57
 OK = 28
@@ -28,6 +32,11 @@ PLAY = 164
 PREV = 165
 NEXT = 163
 CONFIG = 171
+ESCAPE = 111
+STARTAUTO = 112
+STARTLINE = 113
+STARTLIGHT = 114
+
 
 ARMSTART = 40 
 ARMEND = 155
@@ -44,6 +53,7 @@ class myapp():
     
     def __init__(self, motor=None, headlight=None, taillight = None, buzzer = None):
         self.serverup=False
+        self.automode=False
         self.taillight = taillight
         self.TCP_Server=Server(motor, headlight, taillight, buzzer)
         print "Initializing..."
@@ -92,6 +102,24 @@ class myapp():
             self.TCP_Server.StopTcpServer()
             self.serverup=False
             print "Close TCP"
+    
+    def run_light(self):
+        self.PWM.setMotorModel(0,0,0,0)
+        while self.automode:
+            L = self.adc.recvADC(0)
+            R = self.adc.recvADC(1)
+            if L < 2.99 and R < 2.99 :
+                self.PWM.setMotorModel(600,600,600,600)
+                
+            elif abs(L-R)<0.15:
+                self.PWM.setMotorModel(0,0,0,0)
+                
+            elif L > 3 or R > 3:
+                if L > R :
+                    self.PWM.setMotorModel(-1200,-1200,1400,1400)
+                    
+                elif R > L :
+                    self.PWM.setMotorModel(1400,1400,-1200,-1200)
             
 if __name__ == '__main__':
     devices = map(InputDevice, ('/dev/input/event0','/dev/input/event3'))
@@ -106,8 +134,10 @@ if __name__ == '__main__':
     myservo.setServoPwm('4',curhandangle)
     headlight=LED(HEADLIGHTPIN)
     taillight = TailLight(LEFTREDPIN, LEFTGREENPIN, RIGHTREDPIN, RIGHTGREENPIN)
-    PWM=Motor(taillight)
-    myshow=myapp(PWM, headlight, taillight, buzzer)
+    
+    self.adc=Adc()
+    self.PWM=Motor(taillight)
+    myshow=myapp(self.PWM, headlight, taillight, buzzer)
     
     sdcount = 0
     try:
@@ -117,10 +147,10 @@ if __name__ == '__main__':
               for event in devices[fd].read():
                 if event.type == ecodes.EV_KEY:
                     if event.value == 0: # release stop
-			if event.code != 57:
-                            PWM.setMotorModel(0,0,0,0)
+                        if event.code != 57:
+                            PWM.setMotorModel(0,0,0,0) # This will turn on the taillight
                             buzzer.run('0')
-                            # tail.bothred()
+                            # tail.bothred() so this is no longer necessary
                             sdcount = 0
                     elif event.value == 1: # press - start
                         if event.code == UP:
@@ -128,10 +158,10 @@ if __name__ == '__main__':
                         elif event.code == DOWN:
                             PWM.setMotorModel(-1000,-1000,-1000,-1000)
                         elif event.code == LEFT:
-                            # tail.leftblink() Given the change in motor, I don't think we need this now.
+                            # tail.leftblink() Given the change in motor code, I don't think we need this now.
                             PWM.setMotorModel(-1500,-1500,2000,2000)
                         elif event.code == RIGHT:
-                            # tail.rightblink()
+                            # tail.rightblink() motor class is taking care of turning the blinkers on
                             PWM.setMotorModel(2000,2000,-1500,-1500)
                         elif event.code == SPACE:
                             myshow.on_pushButton()
@@ -157,7 +187,17 @@ if __name__ == '__main__':
                                 curhandangle = curhandangle + 5
                                 myservo.setServoPwm('4', curhandangle)
                         elif event.code == CONFIG:
-                		headlight.toggle()
+                            headlight.toggle()
+                        elif event.code == ESCAPE:
+                            self.automode = False
+                        elif event.code == STARTAUTO:
+                            pass
+                        elif event.code == STARTLINE:
+                            pass
+                        elif event.code == STARTLIGHT:
+                            self.automode = True
+                            t = threading.Thread(target=self.run_light)
+                            t.start()
                         else:
                             print(categorize(event))
                     elif event.value == 2: # Holding - long press processing
