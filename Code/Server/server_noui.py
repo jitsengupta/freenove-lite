@@ -6,6 +6,7 @@ import time
 import threading
 import picamera
 import sys,getopt
+import RPi.GPIO as GPIO
 from threading import Thread
 from Thread import *
 from server import Server
@@ -103,6 +104,35 @@ class myapp():
             self.serverup=False
             print "Close TCP"
     
+    def run_line(self):
+        IR01 = 14
+        IR02 = 15
+        IR03 = 23
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(IR01,GPIO.IN)
+        GPIO.setup(IR02,GPIO.IN)
+        GPIO.setup(IR03,GPIO.IN)
+        while self.automode:
+            self.LMR=0x00
+            if GPIO.input(IR01)==True:
+                self.LMR=(self.LMR | 4)
+            if GPIO.input(IR02)==True:
+                self.LMR=(self.LMR | 2)
+            if GPIO.input(IR03)==True:
+                self.LMR=(self.LMR | 1)
+            if self.LMR==2:
+                self.PWM.setMotorModel(800,800,800,800)
+            elif self.LMR==4:
+                self.PWM.setMotorModel(-1500,-1500,2500,2500)
+            elif self.LMR==6:
+                self.PWM.setMotorModel(-2000,-2000,4000,4000)
+            elif self.LMR==1:
+                self.PWM.setMotorModel(2500,2500,-1500,-1500)
+            elif self.LMR==3:
+                self.PWM.setMotorModel(4000,4000,-2000,-2000)
+            elif self.LMR==7:
+                pass
+            
     def run_light(self):
         self.PWM.setMotorModel(0,0,0,0)
         while self.automode:
@@ -193,11 +223,11 @@ if __name__ == '__main__':
                         elif event.code == STARTAUTO:
                             pass
                         elif event.code == STARTLINE:
-                            pass
+                            self.automode = True
+                            threading.Thread(target=self.run_line).start()
                         elif event.code == STARTLIGHT:
                             self.automode = True
-                            t = threading.Thread(target=self.run_light)
-                            t.start()
+                            threading.Thread(target=self.run_light).start()
                         else:
                             print(categorize(event))
                     elif event.value == 2: # Holding - long press processing
