@@ -15,11 +15,10 @@ from select import select
 from Motor import *
 from Buzzer import *
 from Ultrasonic import *
-from Adc import *
+from ADC import *
 from servo import *
 from gpiozero import LED
 from TailLight import TailLight
-from builtins import True
 
 SPACE = 57
 OK = 28
@@ -33,10 +32,10 @@ PLAY = 164
 PREV = 165
 NEXT = 163
 CONFIG = 171
-ESCAPE = 111
-STARTAUTO = 112
-STARTLINE = 113
-STARTLIGHT = 114
+ESCAPE = 1
+STARTAUTO = 22
+STARTLINE = 23
+STARTLIGHT = 38
 
 
 ARMSTART = 40 
@@ -53,10 +52,12 @@ RIGHTREDPIN = 20
 class myapp():
     
     def __init__(self, motor=None, headlight=None, taillight = None, buzzer = None):
+	self.PWM=motor
         self.serverup=False
         self.automode=False
         self.taillight = taillight
         self.TCP_Server=Server(motor, headlight, taillight, buzzer)
+	self.adc = Adc()
         print "Initializing..."
         self.on_pushButton()
                         
@@ -108,6 +109,7 @@ class myapp():
         IR01 = 14
         IR02 = 15
         IR03 = 23
+	print "Line Follow Start!"
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(IR01,GPIO.IN)
         GPIO.setup(IR02,GPIO.IN)
@@ -132,8 +134,10 @@ class myapp():
                 self.PWM.setMotorModel(4000,4000,-2000,-2000)
             elif self.LMR==7:
                 pass
+	print "Line Follow End!"
             
     def run_light(self):
+	print "Light follow start!"
         self.PWM.setMotorModel(0,0,0,0)
         while self.automode:
             L = self.adc.recvADC(0)
@@ -150,6 +154,7 @@ class myapp():
                     
                 elif R > L :
                     self.PWM.setMotorModel(1400,1400,-1200,-1200)
+	print "Light follow start!"
             
 if __name__ == '__main__':
     devices = map(InputDevice, ('/dev/input/event0','/dev/input/event3'))
@@ -165,9 +170,8 @@ if __name__ == '__main__':
     headlight=LED(HEADLIGHTPIN)
     taillight = TailLight(LEFTREDPIN, LEFTGREENPIN, RIGHTREDPIN, RIGHTGREENPIN)
     
-    self.adc=Adc()
-    self.PWM=Motor(taillight)
-    myshow=myapp(self.PWM, headlight, taillight, buzzer)
+    PWM=Motor(taillight)
+    myshow=myapp(PWM, headlight, taillight, buzzer)
     
     sdcount = 0
     try:
@@ -223,11 +227,11 @@ if __name__ == '__main__':
                         elif event.code == STARTAUTO:
                             pass
                         elif event.code == STARTLINE:
-                            self.automode = True
-                            threading.Thread(target=self.run_line).start()
+                            myapp.automode = True
+                            threading.Thread(target=myapp.run_line).start()
                         elif event.code == STARTLIGHT:
-                            self.automode = True
-                            threading.Thread(target=self.run_light).start()
+                            myapp.automode = True
+                            threading.Thread(target=myapp.run_light).start()
                         else:
                             print(categorize(event))
                     elif event.value == 2: # Holding - long press processing
