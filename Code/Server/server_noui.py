@@ -19,7 +19,6 @@ from ADC import *
 from servo import *
 from gpiozero import LED
 from TailLight import TailLight
-from builtins import True
 
 SPACE = 57
 OK = 28
@@ -163,7 +162,7 @@ class myapp():
                     
                 elif R > L :
                     self.PWM.setMotorModel(1400,1400,-1200,-1200)
-	print "Light follow start!"
+	print "Light follow finished!"
             
 if __name__ == '__main__':
     devices = map(InputDevice, ('/dev/input/event0','/dev/input/event3'))
