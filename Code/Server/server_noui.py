@@ -19,7 +19,6 @@ from ADC import *
 from servo import *
 from gpiozero import LED
 from TailLight import TailLight
-from builtins import True
 
 SPACE = 57
 OK = 28
@@ -163,7 +162,7 @@ class myapp():
                     
                 elif R > L :
                     self.PWM.setMotorModel(1400,1400,-1200,-1200)
-	print "Light follow start!"
+	print "Light follow finished!"
             
 if __name__ == '__main__':
     devices = map(InputDevice, ('/dev/input/event0','/dev/input/event3'))
@@ -232,13 +231,13 @@ if __name__ == '__main__':
                         elif event.code == CONFIG:
                             headlight.toggle()
                         elif event.code == ESCAPE:
-                            myapp.automode = False
+                            myshow.automode = False
                         elif event.code == STARTAUTO:
                             pass
                         elif event.code == STARTLINE:
-                            myapp.run_line_thread()
+                            myshow.run_line_thread()
                         elif event.code == STARTLIGHT:
-                            myapp.run_light_thread()
+                            myshow.run_light_thread()
                         else:
                             print(categorize(event))
                     elif event.value == 2: # Holding - long press processing
