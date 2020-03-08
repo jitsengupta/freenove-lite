@@ -41,17 +41,17 @@ class Ultrasonic:
             else :
                 self.PWM.setMotorModel(-1450,-1450,1450,1450)
         elif L < 30 and M < 30:
-            PWM.setMotorModel(1500,1500,-1500,-1500)
+            self.PWM.setMotorModel(1500,1500,-1500,-1500)
         elif R < 30 and M < 30:
-            PWM.setMotorModel(-1500,-1500,1500,1500)
+            self.PWM.setMotorModel(-1500,-1500,1500,1500)
         elif L < 20 :
-            PWM.setMotorModel(2000,2000,-500,-500)
+            self.PWM.setMotorModel(2000,2000,-500,-500)
             if L < 10 :
-                PWM.setMotorModel(1500,1500,-1000,-1000)
+                self.PWM.setMotorModel(1500,1500,-1000,-1000)
         elif R < 20 :
-            PWM.setMotorModel(-500,-500,2000,2000)
+            self.PWM.setMotorModel(-500,-500,2000,2000)
             if R < 10 :
-                PWM.setMotorModel(-1500,-1500,1500,1500)
+                self.PWM.setMotorModel(-1500,-1500,1500,1500)
         else :
             self.PWM.setMotorModel(600,600,600,600)
                 

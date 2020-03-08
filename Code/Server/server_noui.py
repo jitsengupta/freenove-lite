@@ -232,13 +232,13 @@ if __name__ == '__main__':
                         elif event.code == CONFIG:
                             headlight.toggle()
                         elif event.code == ESCAPE:
-                            myapp.automode = False
+                            myshow.automode = False
                         elif event.code == STARTAUTO:
                             pass
                         elif event.code == STARTLINE:
-                            myapp.run_line_thread()
+                            myshow.run_line_thread()
                         elif event.code == STARTLIGHT:
-                            myapp.run_light_thread()
+                            myshow.run_light_thread()
                         else:
                             print(categorize(event))
                     elif event.value == 2: # Holding - long press processing

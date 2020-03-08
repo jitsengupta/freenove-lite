@@ -83,6 +83,8 @@ class Motor:
             (maybe(self.taillight)).leftblink()
         elif duty1 < 0 and duty2 < 0 and duty3 > 0 and duty4 > 0:
             (maybe(self.taillight)).rightblink()
+        elif duty1 < 0 and duty3 < 0 and duty2 > 0 and duty4 > 0:
+            (maybe(self.taillight)).flash()
         else:
             (maybe(self.taillight)).bothred()
             
