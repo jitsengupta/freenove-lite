@@ -57,11 +57,11 @@ class TailLight:
     
     def leftblink(self):
         self.bothred()
-        self.red.blink(0.5, 0.5)
+        self.red.blink(0.25, 0.25)
     
     def rightblink(self):
         self.bothred()
-        maybe(self.rightred).blink(0.5, 0.5)
+        maybe(self.rightred).blink(0.25, 0.25)
 
     def flash(self):
         self.bothred()

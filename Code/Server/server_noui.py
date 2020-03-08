@@ -19,6 +19,7 @@ from ADC import *
 from servo import *
 from gpiozero import LED
 from TailLight import TailLight
+from builtins import True
 
 SPACE = 57
 OK = 28
@@ -104,7 +105,15 @@ class myapp():
             self.TCP_Server.StopTcpServer()
             self.serverup=False
             print "Close TCP"
-    
+ 
+    def run_light_thread(self):
+        self.automode = True
+        threading.Thread(target=self.run_light).start()
+            
+    def run_line_thread(self):
+        self.automode = True
+        threading.Thread(target=self.run_line).start()
+            
     def run_line(self):
         IR01 = 14
         IR02 = 15
@@ -223,15 +232,13 @@ if __name__ == '__main__':
                         elif event.code == CONFIG:
                             headlight.toggle()
                         elif event.code == ESCAPE:
-                            self.automode = False
+                            myapp.automode = False
                         elif event.code == STARTAUTO:
                             pass
                         elif event.code == STARTLINE:
-                            myapp.automode = True
-                            threading.Thread(target=myapp.run_line).start()
+                            myapp.run_line_thread()
                         elif event.code == STARTLIGHT:
-                            myapp.automode = True
-                            threading.Thread(target=myapp.run_light).start()
+                            myapp.run_light_thread()
                         else:
                             print(categorize(event))
                     elif event.value == 2: # Holding - long press processing
