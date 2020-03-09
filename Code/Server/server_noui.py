@@ -136,10 +136,10 @@ class myapp():
                 self.PWM.forward()
                 ultra.look_forward()
             elif cur_state == 1:
-                self.PWM.stop()
+                self.PWM.stopMotor()
                 ultra.look_left()
             elif cur_state == 2:
-                self.PWM.stop()
+                self.PWM.stopMotor()
                 ultra.look_right()
             elif cur_state == 3:
                 self.PWM.backup()
