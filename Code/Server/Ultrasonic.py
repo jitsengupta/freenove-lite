@@ -10,6 +10,11 @@ GPIO.setmode(GPIO.BCM)
 GPIO.setup(trigger_pin,GPIO.OUT)
 GPIO.setup(echo_pin,GPIO.IN)
 class Ultrasonic:
+    
+    def __init__(self):
+        self.PWM=Motor()
+        self.pwm_S=Servo()
+
     def send_trigger_pulse(self):
         GPIO.output(trigger_pin,True)
         time.sleep(0.00015)
@@ -19,7 +24,16 @@ class Ultrasonic:
         count = timeout
         while GPIO.input(echo_pin) != value and count>0:
             count = count-1
-     
+    
+    def look_left(self):
+        self.pwm_S.setServoPwm('0',30)
+
+    def look_right(self):
+        self.pwm_S.setServoPwm('0',150)
+    
+    def look_forward(self):
+        self.pwm_S.setServoPwm('0',90)
+                 
     def get_distance(self):
         distance_cm=[0,0,0,0,0]
         for i in range(3):
@@ -32,6 +46,7 @@ class Ultrasonic:
             distance_cm[i] = pulse_len/0.000058
         distance_cm=sorted(distance_cm)
         return int(distance_cm[2])
+    
     def run_motor(self,L,M,R):
         if (L < 30 and M < 30 and R <30) or M < 30 :
             self.PWM.setMotorModel(-1450,-1450,-1450,-1450) 
@@ -56,8 +71,6 @@ class Ultrasonic:
             self.PWM.setMotorModel(600,600,600,600)
                 
     def run(self):
-        self.PWM=Motor()
-        self.pwm_S=Servo()
         for i in range(30,151,60):
                 self.pwm_S.setServoPwm('0',i)
                 time.sleep(0.2)

@@ -19,6 +19,7 @@ from ADC import *
 from servo import *
 from gpiozero import LED
 from TailLight import TailLight
+from builtins import True
 
 SPACE = 57
 OK = 28
@@ -52,12 +53,12 @@ RIGHTREDPIN = 20
 class myapp():
     
     def __init__(self, motor=None, headlight=None, taillight = None, buzzer = None):
-	self.PWM=motor
+        self.PWM=motor
         self.serverup=False
         self.automode=False
         self.taillight = taillight
         self.TCP_Server=Server(motor, headlight, taillight, buzzer)
-	self.adc = Adc()
+        self.adc = Adc()
         print "Initializing..."
         self.on_pushButton()
                         
@@ -112,12 +113,58 @@ class myapp():
     def run_line_thread(self):
         self.automode = True
         threading.Thread(target=self.run_line).start()
+        
+    def run_ultrasonic_thread(self):
+        self.automode = True
+        threading.Thread(target=self.run_ultrasonic).start()
+        
+    # Event types
+    # 0 - d < x
+    # 1 - d >= x
+    # 2 - l > r   - for future enhancement not using in first try
+    # 3 - l <= r  - ditto
+    def run_ultrasonic(self):
+        ttable = [[1, 0], [2, 4], [3, 5], [1, 1], [0, 0], [0, 0]]
+        x = 30
+        ultra = Ultrasonic()
+        print "Auto drive Start!"
+        
+        cur_state = 0
+        
+        while self.automode:
+            if cur_state == 0:
+                self.PWM.forward()
+                ultra.look_forward()
+            elif cur_state == 1:
+                self.PWM.stop()
+                ultra.look_left()
+            elif cur_state == 2:
+                self.PWM.stop()
+                ultra.look_right()
+            elif cur_state == 3:
+                self.PWM.backup()
+            elif cur_state == 4:
+                self.PWM.turnLeft()
+            elif cur_state == 5:
+                self.PWM.turnRight()
+            else:
+                print "Wrong state?"
+                cur_state = 0
+
+            time.sleep(0.2)
+            d = ultra.get_distance()
+            
+            e = 0 if d < x else 1
+            cur_state = ttable[cur_state][e]
+            
+        print "Auto drive End!"
+        
             
     def run_line(self):
         IR01 = 14
         IR02 = 15
         IR03 = 23
-	print "Line Follow Start!"
+        print "Line Follow Start!"
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(IR01,GPIO.IN)
         GPIO.setup(IR02,GPIO.IN)
@@ -142,7 +189,7 @@ class myapp():
                 self.PWM.setMotorModel(4000,4000,-2000,-2000)
             elif self.LMR==7:
                 pass
-	print "Line Follow End!"
+            print "Line Follow End!"
             
     def run_light(self):
 	print "Light follow start!"
@@ -190,21 +237,18 @@ if __name__ == '__main__':
                 if event.type == ecodes.EV_KEY:
                     if event.value == 0: # release stop
                         if event.code != 57:
-                            PWM.setMotorModel(0,0,0,0) # This will turn on the taillight
+                            PWM.stopMotor() # This will turn on the taillight
                             buzzer.run('0')
-                            # tail.bothred() so this is no longer necessary
                             sdcount = 0
                     elif event.value == 1: # press - start
                         if event.code == UP:
-                            PWM.setMotorModel(1000,1000,1000,1000)      
+                            PWM.forward()
                         elif event.code == DOWN:
-                            PWM.setMotorModel(-1000,-1000,-1000,-1000)
+                            PWM.backup()
                         elif event.code == LEFT:
-                            # tail.leftblink() Given the change in motor code, I don't think we need this now.
-                            PWM.setMotorModel(-1500,-1500,2000,2000)
+                            PWM.turnLeft()
                         elif event.code == RIGHT:
-                            # tail.rightblink() motor class is taking care of turning the blinkers on
-                            PWM.setMotorModel(2000,2000,-1500,-1500)
+                            PWM.turnRight()
                         elif event.code == SPACE:
                             myshow.on_pushButton()
                         elif event.code == OK:

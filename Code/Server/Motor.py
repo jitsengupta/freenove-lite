@@ -71,6 +71,23 @@ class Motor:
             self.pwm.setMotorPwm(4,4095)
             self.pwm.setMotorPwm(5,4095)
             
+    def stopMotor(self):
+        self.setMotorModel(0,0,0,0)
+        
+    def fastForward(self):
+        self.setMotorModel(1500,1500,1500,1500)
+    
+    def forward(self):
+        self.setMotorModel(1000,1000,1000,1000)
+    
+    def turnLeft(self):
+        self.setMotorModel(-1500,-1500,2000,2000)
+    
+    def turnRight(self):
+        self.setMotorModel(2000,2000,-1500,-1500)
+    
+    def backup(self):
+        self.setMotorModel(-1000,-1000,-1000,-1000)
  
     def setMotorModel(self,duty1,duty2,duty3,duty4):
         duty1,duty2,duty3,duty4=self.duty_range(duty1,duty2,duty3,duty4)
