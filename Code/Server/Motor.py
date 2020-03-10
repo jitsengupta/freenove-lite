@@ -77,6 +77,9 @@ class Motor:
     def fastForward(self):
         self.setMotorModel(1500,1500,1500,1500)
     
+    def slowforward(self):
+        self.setMotorModel(700,700,700,700)
+    
     def forward(self):
         self.setMotorModel(1000,1000,1000,1000)
     

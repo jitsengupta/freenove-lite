@@ -26,13 +26,13 @@ class Ultrasonic:
             count = count-1
     
     def look_left(self):
-        self.pwm_S.setServoPwm('0',30)
+        self.pwm_S.setServoPwm('0',120)
 
     def look_right(self):
-        self.pwm_S.setServoPwm('0',150)
+        self.pwm_S.setServoPwm('0',20)
     
     def look_forward(self):
-        self.pwm_S.setServoPwm('0',90)
+        self.pwm_S.setServoPwm('0',70)
                  
     def get_distance(self):
         distance_cm=[0,0,0,0,0]

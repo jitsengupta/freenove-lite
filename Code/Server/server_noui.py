@@ -19,7 +19,6 @@ from ADC import *
 from servo import *
 from gpiozero import LED
 from TailLight import TailLight
-from builtins import True
 
 SPACE = 57
 OK = 28
@@ -125,7 +124,7 @@ class myapp():
     # 3 - l <= r  - ditto
     def run_ultrasonic(self):
         ttable = [[1, 0], [2, 4], [3, 5], [1, 1], [0, 0], [0, 0]]
-        x = 30
+        x = 40
         ultra = Ultrasonic()
         print "Auto drive Start!"
         
@@ -133,7 +132,7 @@ class myapp():
         
         while self.automode:
             if cur_state == 0:
-                self.PWM.forward()
+                self.PWM.slowforward()
                 ultra.look_forward()
             elif cur_state == 1:
                 self.PWM.stopMotor()
@@ -145,13 +144,15 @@ class myapp():
                 self.PWM.backup()
             elif cur_state == 4:
                 self.PWM.turnLeft()
+		time.sleep(0.2)
             elif cur_state == 5:
                 self.PWM.turnRight()
+		time.sleep(0.2)
             else:
                 print "Wrong state?"
                 cur_state = 0
 
-            time.sleep(0.2)
+            time.sleep(0.3)
             d = ultra.get_distance()
             
             e = 0 if d < x else 1
@@ -277,7 +278,7 @@ if __name__ == '__main__':
                         elif event.code == ESCAPE:
                             myshow.automode = False
                         elif event.code == STARTAUTO:
-                            pass
+                            myshow.run_ultrasonic_thread()
                         elif event.code == STARTLINE:
                             myshow.run_line_thread()
                         elif event.code == STARTLIGHT:
