@@ -241,76 +241,77 @@ if __name__ == '__main__':
                 if event.type == ecodes.EV_KEY:
                     if event.value == 0: # release stop
                         if event.code != 57:
-                            PWM.stopMotor() # This will turn on the taillight
+                            if PWM.moving and not(myshow.automode):
+			    	PWM.stopMotor() # This will turn on the taillight
+                            	display.show(1,"Stop")
                             buzzer.run('0')
                             sdcount = 0
-                            display.show("Stop")
                     elif event.value == 1: # press - start
                         if event.code == UP:
                             PWM.forward()
-                            display.show("Going forward")
+                            display.show(1,"Going forward")
                         elif event.code == DOWN:
                             PWM.backup()
-                            display.show("Backing up")
+                            display.show(1,"Backing up")
                         elif event.code == LEFT:
                             PWM.turnLeft()
-                            display.show("Turning left")
+                            display.show(1,"Turning left")
                         elif event.code == RIGHT:
                             PWM.turnRight()
-                            display.show("Turning right")
+                            display.show(1,"Turning right")
                         elif event.code == SPACE:
                             myshow.on_pushButton()
-                            display.show("Server start/stop")
+                            display.show(1,"Server start/stop")
                         elif event.code == OK:
                             buzzer.run('1') 
-                            display.show("Horn!")
+                            display.show(1,"Horn!")
                         elif event.code == VUP:
-                            display.show("Arm up")
+                            display.show(1,"Arm up")
                             if curarmangle >= ARMSTART + 5:
                                 curarmangle = curarmangle - 5
                                 myservo.setServoPwm('3', curarmangle)
                         elif event.code == VDOWN:
-                            display.show("Arm down")
+                            display.show(1,"Arm down")
                             if curarmangle <= ARMEND - 5:
                                 curarmangle = curarmangle + 5
                                 myservo.setServoPwm('3', curarmangle)
                         elif event.code == PLAY:
-                            display.show("Claw release")
+                            display.show(1,"Claw release")
                             curhandangle = HANDEND
                             myservo.setServoPwm('4',curhandangle)
                         elif event.code == PREV:
-                            display.show("Claw close")
+                            display.show(1,"Claw close")
                             if curhandangle >= HANDSTART + 5:
                                 curhandangle = curhandangle - 5
                                 myservo.setServoPwm('4', curhandangle)
                         elif event.code == NEXT:
-                            display.show("Claw open")
+                            display.show(1,"Claw open")
                             if curhandangle <= HANDEND - 5:
                                 curhandangle = curhandangle + 5
                                 myservo.setServoPwm('4', curhandangle)
                         elif event.code == CONFIG:
-                            display.show("Headlight on/off")
+                            display.show(1,"Headlight on/off")
                             headlight.toggle()
                         elif event.code == ESCAPE:
-                            display.show("Auto end")
+                            display.show(1,"Auto end")
                             myshow.automode = False
                         elif event.code == STARTAUTO:
-                            display.show("Starting automode")
+                            display.show(1,"Starting automode")
                             myshow.run_ultrasonic_thread()
                         elif event.code == STARTLINE:
-                            display.show("Starting line follow")
+                            display.show(1,"Starting line follow")
                             myshow.run_line_thread()
                         elif event.code == STARTLIGHT:
-                            display.show("Starting light follow")
+                            display.show(1,"Starting light follow")
                             myshow.run_light_thread()
                         else:
-                            display.show("Unknown key")
+                            display.show(1,"Unknown key")
                             print(categorize(event))
                     elif event.value == 2: # Holding - long press processing
                         if event.code == 57: # long press play/pause button
                             sdcount = sdcount + 1
-    			if sdcount > 30:
-                    display.show("Stop")
+    		if sdcount > 30:
+                    display.show(1,"Stop")
                     os.system("sudo poweroff")
     except KeyboardInterrupt:
         myshow.close()

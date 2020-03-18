@@ -9,23 +9,15 @@ class Display:
     def __init__(self):
         self.lcd0 = LCD()
         self.attached = False
+        self.lcd0.openWaitForAttachment(2000)
+	self.lcd0.setBacklight(0.3)
         
-        self.lcd0.setOnAttachHandler(self.onAttach)
-        self.lcd0.setOnDetachHandler(self.onDetach)
-    
-        lcd0.openWaitForAttachment(2000)
-        
-    def onAttach(self):
-        self.attached = True
-    
-    def onDetach(self):
-       self.attached = False
-
     def clear(self):
         self.lcd0.clear()
         
     def show(self, lineno, text):    
-        self.lcd0.writeText(LCDFont.FONT_5x8, lineno, 0, text)
+	text = text.ljust(20)
+        self.lcd0.writeText(LCDFont.FONT_5x8, 0, lineno, text)
         self.lcd0.flush()
 
     def close(self):    

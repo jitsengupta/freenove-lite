@@ -7,6 +7,7 @@ class Motor:
         self.pwm = PCA9685(0x40, debug=True)
         self.pwm.setPWMFreq(50)
         self.taillight = tail
+	self.moving = False
         
     def duty_range(self,duty1,duty2,duty3,duty4):
         if duty1>4095:
@@ -73,24 +74,31 @@ class Motor:
             
     def stopMotor(self):
         self.setMotorModel(0,0,0,0)
+	self.moving = False
         
     def fastForward(self):
         self.setMotorModel(1500,1500,1500,1500)
+	self.moving = True
     
     def slowforward(self):
         self.setMotorModel(700,700,700,700)
+	self.moving = True
     
     def forward(self):
         self.setMotorModel(1000,1000,1000,1000)
+	self.moving = True
     
     def turnLeft(self):
         self.setMotorModel(-1500,-1500,2000,2000)
+	self.moving = True
     
     def turnRight(self):
         self.setMotorModel(2000,2000,-1500,-1500)
+	self.moving = True
     
     def backup(self):
         self.setMotorModel(-1000,-1000,-1000,-1000)
+	self.moving = True
  
     def setMotorModel(self,duty1,duty2,duty3,duty4):
         duty1,duty2,duty3,duty4=self.duty_range(duty1,duty2,duty3,duty4)
@@ -107,6 +115,11 @@ class Motor:
             (maybe(self.taillight)).flash()
         else:
             (maybe(self.taillight)).bothred()
+
+	if duty1 != 0 and duty2 != 0 and duty3 != 0 and duty4 != 0:
+	    self.moving = True
+	else:
+	    self.moving = False
             
             
 PWM=Motor()          
