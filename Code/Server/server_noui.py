@@ -194,7 +194,7 @@ class myapp():
             print "Line Follow End!"
             
     def run_light(self):
-	print "Light follow start!"
+        print "Light follow start!"
         self.PWM.setMotorModel(0,0,0,0)
         while self.automode:
             L = self.adc.recvADC(0)
@@ -211,7 +211,7 @@ class myapp():
                     
                 elif R > L :
                     self.PWM.setMotorModel(1400,1400,-1200,-1200)
-	print "Light follow finished!"
+        print "Light follow finished!"
             
 if __name__ == '__main__':
     devices = map(InputDevice, ('/dev/input/event0','/dev/input/event3'))
