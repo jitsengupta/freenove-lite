@@ -191,7 +191,7 @@ class myapp():
                 self.PWM.setMotorModel(4000,4000,-2000,-2000)
             elif self.LMR==7:
                 pass
-            print "Line Follow End!"
+        print "Line Follow End!"
             
     def run_light(self):
         print "Light follow start!"
@@ -311,7 +311,7 @@ if __name__ == '__main__':
                         if event.code == 57: # long press play/pause button
                             sdcount = sdcount + 1
     		if sdcount > 30:
-                    display.show(1,"Stop")
+                    display.show(1,"Powering off!")
                     os.system("sudo poweroff")
     except KeyboardInterrupt:
         myshow.close()

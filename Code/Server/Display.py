@@ -1,6 +1,7 @@
 from Phidget22.Phidget import *
 from Phidget22.Devices.LCD import *
 from threading import Thread
+from Thread import *
 from pymaybe import maybe
 import time
 
@@ -21,23 +22,26 @@ class Display:
         if self.lcd0.getAttached():
             text = text + " "
             curp = 0
-            l = text.length
+            l = len(text)
             disp = ""
             while True:
                 if curp + 20 <= l:
                     disp = text[curp:curp+20]
                 else:
-                    disp = text[curp:l] + text[0:l-curp]
+                    disp = text[curp:l] + text[0:20-l+curp]
                 self.lcd0.writeText(LCDFont.FONT_5x8, 0, lineno, disp)
+		self.lcd0.flush()
                 time.sleep(0.2)
-                curp = curp + 1
+                curp = (curp + 1)%l
         
-    def show(self, lineno, text): 
+    def show(self, lineno, text, scroll=False): 
         if self.scroll_thread:
-            self.scroll_thread.stop()
+            stop_thread(self.scroll_thread)
             self.scroll_thread = None   
+	if not(scroll) and len(text) > 0:
+		text = text[0:20]
         if self.lcd0.getAttached():
-            if text.length <= 0:
+            if len(text) <= 20:
                 text = text.ljust(20)
                 self.lcd0.writeText(LCDFont.FONT_5x8, 0, lineno, text)
                 self.lcd0.flush()
@@ -46,6 +50,9 @@ class Display:
                 self.scroll_thread.start()   
 
     def close(self):    
+	if self.scroll_thread:
+		stop_thread(self.scroll_thread)
+
         self.lcd0.close()
 
                
@@ -53,9 +60,9 @@ if __name__ == '__main__':
     d = Display()
     
     d.show(0, "My name is Ishani Alicia Sengupta")
-    d.show(1, "I love you")
-    
     time.sleep(5)
+    d.show(1, "Hello world")
+    time.sleep(2)
     d.clear()
     
     d.close()
