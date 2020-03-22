@@ -29,8 +29,14 @@ class Display:
                     disp = text[curp:curp+20]
                 else:
                     disp = text[curp:l] + text[0:20-l+curp]
-                self.lcd0.writeText(LCDFont.FONT_5x8, 0, lineno, disp)
-		self.lcd0.flush()
+		try:
+                    self.lcd0.writeText(LCDFont.FONT_5x8, 0, lineno, disp)
+		    self.lcd0.flush()
+		except:
+		    err = sys.exc_info()
+    		    print "Unexpected error:", err[0]
+		    if len(err) > 1:
+			print err[1]
                 time.sleep(0.2)
                 curp = (curp + 1)%l
         
@@ -43,8 +49,14 @@ class Display:
         if self.lcd0.getAttached():
             if len(text) <= 20:
                 text = text.ljust(20)
-                self.lcd0.writeText(LCDFont.FONT_5x8, 0, lineno, text)
-                self.lcd0.flush()
+                try:
+		    self.lcd0.writeText(LCDFont.FONT_5x8, 0, lineno, text)
+                    self.lcd0.flush()
+		except:
+		    err = sys.exc_info()
+    		    print "Unexpected error:", err[0]
+		    if len(err) > 1:
+			print err[1]
             else:
                 self.scroll_thread = Thread(target=self.scroll, args=(lineno, text))
                 self.scroll_thread.start()   
