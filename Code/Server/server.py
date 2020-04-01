@@ -283,13 +283,13 @@ class Server:
             ADC_Power=self.adc.recvADC(2)*3
             time.sleep(3)
             if ADC_Power < 6.8:
-                for i in range(4):
+                for i in range(1):
                     self.buzzer.run('1')
                     time.sleep(0.1)
                     self.buzzer.run('0')
                     time.sleep(0.1)
             elif ADC_Power< 7:
-                for i in range(2):
+                for i in range(1):
                     self.buzzer.run('1')
                     time.sleep(0.1)
                     self.buzzer.run('0')

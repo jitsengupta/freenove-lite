@@ -89,11 +89,11 @@ class Motor:
 	self.moving = True
     
     def turnLeft(self):
-        self.setMotorModel(-1500,-1500,2000,2000)
+        self.setMotorModel(-2000,-2000,2000,2000)
 	self.moving = True
     
     def turnRight(self):
-        self.setMotorModel(2000,2000,-1500,-1500)
+        self.setMotorModel(2000,2000,-2000,-2000)
 	self.moving = True
     
     def backup(self):
