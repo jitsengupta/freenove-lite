@@ -11,12 +11,19 @@ class Display:
     def __init__(self):
         self.lcd0 = LCD()
         self.attached = False
-        self.lcd0.openWaitForAttachment(2000)
-        self.lcd0.setBacklight(0.3)
         self.scroll_thread = None
+	try:
+            self.lcd0.openWaitForAttachment(2000)
+            self.lcd0.setBacklight(0.3)
+	except:
+            err = sys.exc_info()
+            print "Unexpected error:", err[0]
+            if len(err) > 1:
+                print err[1]
         
     def clear(self):
-        self.lcd0.clear()
+	if self.lcd0.getAttached(): 
+            self.lcd0.clear()
         
     def scroll(self, lineno, text):
         if self.lcd0.getAttached():
