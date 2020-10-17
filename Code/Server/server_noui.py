@@ -19,7 +19,7 @@ from ADC import *
 from servo import *
 from gpiozero import LED
 from TailLight import TailLight
-from Display import Display
+from SevenSegDisplay import SevenSegDisplay
 
 SPACE = 57
 OK = 28
@@ -226,7 +226,7 @@ if __name__ == '__main__':
     myservo.setServoPwm('4',curhandangle)
     headlight=LED(HEADLIGHTPIN)
     taillight = TailLight(LEFTREDPIN, LEFTGREENPIN, RIGHTREDPIN, RIGHTGREENPIN)
-    display = Display()
+    display = SevenSegDisplay()
     display.show(0,"Ishani's robot")
     
     PWM=Motor(taillight)
@@ -261,7 +261,7 @@ if __name__ == '__main__':
                             display.show(1,"Turning right")
                         elif event.code == SPACE:
                             myshow.on_pushButton()
-                            display.show(1,"Server start/stop")
+                            display.show(1,"Server start-stop")
                         elif event.code == OK:
                             buzzer.run('1') 
                             display.show(1,"Horn!")

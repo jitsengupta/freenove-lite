@@ -46,17 +46,20 @@ class SevenSegDisplay:
 	while(True):
             self.show_message_alt(text, speed)
 
-    def show(self, text, scroll=False): 
+    def show(self, lineno, text, scroll=True):
         if self.scroll_thread:
             stop_thread(self.scroll_thread)
             self.scroll_thread = None   
 
     	if not(scroll) and len(text) > 0:
-	    text = text[0:self.device.width]
+            text = text[0:self.device.width]
             self.seg.text = text
         else:
-            self.scroll_thread = Thread(target=self.scroll, args=(text,0.2))
-            self.scroll_thread.start()   
+            if (len(text)) <= self.device.width:
+                self.seg.text = text
+            else:
+                self.scroll_thread = Thread(target=self.scroll, args=(text,0.2))
+                self.scroll_thread.start()   
 
     def close(self):    
         if self.scroll_thread:
@@ -66,9 +69,9 @@ class SevenSegDisplay:
 if __name__ == '__main__':
     d = SevenSegDisplay()
     
-    d.show("My name is Ishani Alicia Sengupta", True)
+    d.show(0, "My name is Ishani Alicia Sengupta", True)
     time.sleep(30)
-    d.show("Hello world", True)
+    d.show(1, "HELLO!", True)
     time.sleep(20)
     d.clear()
     
