@@ -58,7 +58,7 @@ class SevenSegDisplay:
             if (len(text)) <= self.device.width:
                 self.seg.text = text
             else:
-                self.scroll_thread = Thread(target=self.scroll, args=(text,0.2))
+                self.scroll_thread = Thread(target=self.scroll, args=(text,0.1))
                 self.scroll_thread.start()   
 
     def close(self):    
