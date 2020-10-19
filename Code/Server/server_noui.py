@@ -221,7 +221,7 @@ if __name__ == '__main__':
     buzzer = Buzzer()
     myservo=Servo()
     curarmangle = ARMSTART
-    curhandangle = (HANDSTART + HANDEND) / 2
+    curhandangle = HANDSTART
     myservo.setServoPwm('3',curarmangle)
     myservo.setServoPwm('4',curhandangle)
     headlight=LED(HEADLIGHTPIN)
@@ -249,16 +249,16 @@ if __name__ == '__main__':
                     elif event.value == 1: # press - start
                         if event.code == UP:
                             PWM.forward()
-                            display.show(1,"Going forward")
+                            display.show(1,"Forward")
                         elif event.code == DOWN:
                             PWM.backup()
-                            display.show(1,"Backing up")
+                            display.show(1,"Backward")
                         elif event.code == LEFT:
                             PWM.turnLeft()
-                            display.show(1,"Turning left")
+                            display.show(1,"LEFT")
                         elif event.code == RIGHT:
                             PWM.turnRight()
-                            display.show(1,"Turning right")
+                            display.show(1,"RIGHT")
                         elif event.code == SPACE:
                             myshow.on_pushButton()
                             display.show(1,"Server start-stop")
@@ -271,32 +271,28 @@ if __name__ == '__main__':
                                 curarmangle = curarmangle - 5
                                 myservo.setServoPwm('3', curarmangle)
                         elif event.code == VDOWN:
-                            display.show(1,"Arm down")
+                            display.show(1,"Arm low")
                             if curarmangle <= ARMEND - 5:
                                 curarmangle = curarmangle + 5
                                 myservo.setServoPwm('3', curarmangle)
                         elif event.code == PLAY:
-                            display.show(1,"Claw release")
-                            curhandangle = HANDEND
-                            myservo.setServoPwm('4',curhandangle)
+                            display.show(1,"Arm down")
+                            curarmangle = ARMEND
+                            myservo.setServoPwm('3',ARMEND)
                         elif event.code == PREV:
-                            display.show(1,"Claw close")
-                            if curhandangle >= HANDSTART + 5:
-                                curhandangle = curhandangle - 5
-                                myservo.setServoPwm('4', curhandangle)
+                            display.show(1,"OPEN")
+                            myservo.setServoPwm('4', HANDSTART)
                         elif event.code == NEXT:
-                            display.show(1,"Claw open")
-                            if curhandangle <= HANDEND - 5:
-                                curhandangle = curhandangle + 5
-                                myservo.setServoPwm('4', curhandangle)
+                            display.show(1,"CLOSE")
+                            myservo.setServoPwm('4', HANDEND)
                         elif event.code == CONFIG:
-                            display.show(1,"Headlight on/off")
+                            display.show(1,"LIGHT on/off")
                             headlight.toggle()
                         elif event.code == ESCAPE:
-                            display.show(1,"Auto end")
+                            display.show(1,"AUTO END")
                             myshow.automode = False
                         elif event.code == STARTAUTO:
-                            display.show(1,"Starting automode")
+                            display.show(1,"AUTO START")
                             myshow.run_ultrasonic_thread()
                         elif event.code == STARTLINE:
                             display.show(1,"Starting line follow")
@@ -305,13 +301,13 @@ if __name__ == '__main__':
                             display.show(1,"Starting light follow")
                             myshow.run_light_thread()
                         else:
-                            display.show(1,"Unknown key")
+                            display.show(1,"UNKNOWN KEY")
                             print(categorize(event))
                     elif event.value == 2: # Holding - long press processing
                         if event.code == 57: # long press play/pause button
                             sdcount = sdcount + 1
     		if sdcount > 30:
-                    display.show(1,"Powering off!")
+                    display.show(1,"POWER OFF")
                     os.system("sudo poweroff")
     except KeyboardInterrupt:
         myshow.close()
