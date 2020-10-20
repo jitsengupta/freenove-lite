@@ -21,6 +21,8 @@ from gpiozero import LED
 from TailLight import TailLight
 from SevenSegDisplay import SevenSegDisplay
 
+ARM = '2'
+HAND = '3'
 SPACE = 57
 OK = 28
 LEFT = 105
@@ -39,8 +41,8 @@ STARTLINE = 23
 STARTLIGHT = 38
 
 
-ARMSTART = 40 
-ARMEND = 155
+ARMSTART = 150 
+ARMEND = 50
 HANDSTART = 25 
 HANDEND = 100
 
@@ -222,8 +224,8 @@ if __name__ == '__main__':
     myservo=Servo()
     curarmangle = ARMSTART
     curhandangle = HANDSTART
-    myservo.setServoPwm('3',curarmangle)
-    myservo.setServoPwm('4',curhandangle)
+    myservo.setServoPwm(ARM,curarmangle)
+    myservo.setServoPwm(HAND,curhandangle)
     headlight=LED(HEADLIGHTPIN)
     taillight = TailLight(LEFTREDPIN, LEFTGREENPIN, RIGHTREDPIN, RIGHTGREENPIN)
     display = SevenSegDisplay()
@@ -267,24 +269,24 @@ if __name__ == '__main__':
                             display.show(1,"Horn!")
                         elif event.code == VUP:
                             display.show(1,"Arm up")
-                            if curarmangle >= ARMSTART + 5:
-                                curarmangle = curarmangle - 5
-                                myservo.setServoPwm('3', curarmangle)
+                            if curarmangle <= ARMSTART - 5:
+                                curarmangle = curarmangle + 5
+                                myservo.setServoPwm(ARM, curarmangle)
                         elif event.code == VDOWN:
                             display.show(1,"Arm low")
-                            if curarmangle <= ARMEND - 5:
-                                curarmangle = curarmangle + 5
-                                myservo.setServoPwm('3', curarmangle)
+                            if curarmangle >= ARMEND + 5:
+                                curarmangle = curarmangle - 5
+                                myservo.setServoPwm(ARM, curarmangle)
                         elif event.code == PLAY:
                             display.show(1,"Arm down")
                             curarmangle = ARMEND
-                            myservo.setServoPwm('3',ARMEND)
+                            myservo.setServoPwm(ARM,ARMEND)
                         elif event.code == PREV:
                             display.show(1,"OPEN")
-                            myservo.setServoPwm('4', HANDSTART)
+                            myservo.setServoPwm(HAND, HANDSTART)
                         elif event.code == NEXT:
                             display.show(1,"CLOSE")
-                            myservo.setServoPwm('4', HANDEND)
+                            myservo.setServoPwm(HAND, HANDEND)
                         elif event.code == CONFIG:
                             display.show(1,"LIGHT on/off")
                             headlight.toggle()
