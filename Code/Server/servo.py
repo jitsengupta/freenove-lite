@@ -33,8 +33,8 @@ class Servo:
 if __name__ == '__main__':
     pwm=Servo()
     for times in range(1,5):
-        pwm.setServoPwm('4',20)
-	time.sleep(0.5)
-        pwm.setServoPwm('4',150)
-	time.sleep(0.5)
-    pwm.setServoPwm('4',90) 
+        pwm.setServoPwm('3',20)
+	time.sleep(2)
+        pwm.setServoPwm('3',150)
+	time.sleep(2)
+    pwm.setServoPwm('3',90) 

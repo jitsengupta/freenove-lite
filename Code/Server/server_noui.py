@@ -6,11 +6,13 @@ import time
 import threading
 import picamera
 import sys, getopt
+import random
 import RPi.GPIO as GPIO
 from threading import Thread
 from Thread import *
 from server import Server
 from evdev import InputDevice, categorize, ecodes
+from rpi_ws281x import *
 from select import select
 from Motor import *
 from Buzzer import *
@@ -37,7 +39,7 @@ PREV = 165
 NEXT = 163
 CONFIG = 171
 ESCAPE = 1
-DANCE = 24
+DANCE = 32
 STARTAUTO = 22
 STARTLINE = 23
 STARTLIGHT = 38
@@ -75,7 +77,7 @@ class myapp():
         self.TCP_Server = Server(motor, headlight, taillight, buzzer)
         self.adc = Adc()
         self.led = Led()
-        myservo = Servo()
+        self.myservo = Servo()
         print "Initializing..."
         self.on_pushButton()
                         
@@ -235,6 +237,8 @@ class myapp():
     
     def dancemove(self, *args):
         for move in args:
+	    if not self.automode:
+		break
             if move == DLEFT:
                 self.PWM.turnLeft()
                 time.sleep(DSPEED)
@@ -243,7 +247,7 @@ class myapp():
                 self.PWM.turnRight()
                 time.sleep(DSPEED)
                 self.PWM.stopMotor()
-            if move == DSPIN:
+            elif move == DSPIN:
                 self.PWM.turnLeft()
                 time.sleep(DSPEED * 2)
                 self.PWM.stopMotor()
@@ -257,14 +261,15 @@ class myapp():
                 self.PWM.stopMotor()
             elif move == DARMUP:
                 self.myservo.setServoPwm(ARM, (ARMSTART + ARMEND) * 2 / 3)
-                time.sleep(DSPEED / 2)
+                time.sleep(DSPEED)
             elif move == DARMDOWN:
-                self.myservo.setServoPwm(ARM, (ARMSTART + ARMEND) * 2 / 3)
-                time.sleep(DSPEED / 2)
+                self.myservo.setServoPwm(ARM, (ARMSTART + ARMEND) * 1 / 3)
+                time.sleep(DSPEED)
             elif move == DCLAP:
                 self.myservo.setServoPwm(HAND, HANDEND)
-                time.sleep(DSPEED / 2)
+                time.sleep(DSPEED)
                 self.myservo.setServoPwm(HAND, HANDSTART)
+		time.sleep(DSPEED)
             else:
                 print "Invalid dance move?"
             
@@ -276,9 +281,11 @@ class myapp():
         ledthread = Thread(target=self.led.ledMode, args=(mode,))
         ledthread.start()
         while self.automode:
-            self.dancemove(DLEFT, DFORWARD, DBACK, DRIGHT, DRIGHT, DFORWARD, DBACK, DLEFT)
+            self.dancemove(DLEFT, DFORWARD, DBACK, DRIGHT, DRIGHT, DFORWARD, DBACK, DLEFT,DARMDOWN,DARMUP,DCLAP)
+	    #self.dancemove(DARMUP, DARMDOWN, DCLAP)
         # stop light show when done
         stop_thread(ledthread)
+	self.led.colorWipe(self.led, Color(0,0,0),10)
         print "Dance moves finished"
 
 
@@ -290,8 +297,6 @@ if __name__ == '__main__':
     buzzer = Buzzer()
     curarmangle = ARMSTART
     curhandangle = HANDSTART
-    self.myservo.setServoPwm(ARM, curarmangle)
-    self.myservo.setServoPwm(HAND, curhandangle)
     headlight = LED(HEADLIGHTPIN)
     taillight = TailLight(LEFTREDPIN, LEFTGREENPIN, RIGHTREDPIN, RIGHTGREENPIN)
     display = SevenSegDisplay()
@@ -300,6 +305,8 @@ if __name__ == '__main__':
     PWM = Motor(taillight)
     myshow = myapp(PWM, headlight, taillight, buzzer)
     
+    myshow.myservo.setServoPwm(ARM, curarmangle)
+    myshow.myservo.setServoPwm(HAND, curhandangle)
     sdcount = 0
     try:
         while True:
@@ -337,22 +344,22 @@ if __name__ == '__main__':
                             display.show(1, "Arm up")
                             if curarmangle <= ARMSTART - 5:
                                 curarmangle = curarmangle + 5
-                                self.myservo.setServoPwm(ARM, curarmangle)
+                                myshow.myservo.setServoPwm(ARM, curarmangle)
                         elif event.code == VDOWN:
                             display.show(1, "Arm down")
                             if curarmangle >= ARMEND + 5:
                                 curarmangle = curarmangle - 5
-                                self.myservo.setServoPwm(ARM, curarmangle)
+                                myshow.myservo.setServoPwm(ARM, curarmangle)
                         elif event.code == PLAY:
                             display.show(1, "Arm rest")
                             curarmangle = (ARMSTART + ARMEND) / 2
-                            self.myservo.setServoPwm(ARM, curarmangle)
+                            myshow.myservo.setServoPwm(ARM, curarmangle)
                         elif event.code == PREV:
                             display.show(1, "OPEN")
-                            self.myservo.setServoPwm(HAND, HANDSTART)
+                            myshow.myservo.setServoPwm(HAND, HANDSTART)
                         elif event.code == NEXT:
                             display.show(1, "CLOSE")
-                            self.myservo.setServoPwm(HAND, HANDEND)
+                            myshow.myservo.setServoPwm(HAND, HANDEND)
                         elif event.code == CONFIG:
                             display.show(1, "LIGHT on/off")
                             headlight.toggle()
