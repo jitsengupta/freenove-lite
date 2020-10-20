@@ -64,6 +64,7 @@ DBACK = 105
 DARMUP = 106
 DARMDOWN = 107
 DCLAP = 108
+DTOOT = 109
 DSPEED = 1  # speed of each move in seconds
 
 
@@ -77,6 +78,7 @@ class myapp():
         self.TCP_Server = Server(motor, headlight, taillight, buzzer)
         self.adc = Adc()
         self.led = Led()
+        self.buzzer = buzzer
         self.myservo = Servo()
         print "Initializing..."
         self.on_pushButton()
@@ -248,7 +250,7 @@ class myapp():
                 time.sleep(DSPEED)
                 self.PWM.stopMotor()
             elif move == DSPIN:
-                self.PWM.turnLeft()
+                self.PWM.spin()
                 time.sleep(DSPEED * 2)
                 self.PWM.stopMotor()
             elif move == DFORWARD:
@@ -259,6 +261,11 @@ class myapp():
                 self.PWM.slowBackup()
                 time.sleep(DSPEED)
                 self.PWM.stopMotor()
+            elif move == DTOOT:
+                self.buzzer.run('1')
+                time.sleep(DSPEED/2)
+                self.buzzer.run('0')
+                time.sleep(DSPEED/2)
             elif move == DARMUP:
                 self.myservo.setServoPwm(ARM, (ARMSTART + ARMEND) * 2 / 3)
                 time.sleep(DSPEED)
@@ -281,7 +288,7 @@ class myapp():
         ledthread = Thread(target=self.led.ledMode, args=(mode,))
         ledthread.start()
         while self.automode:
-            self.dancemove(DLEFT, DFORWARD, DBACK, DRIGHT, DRIGHT, DFORWARD, DBACK, DLEFT,DARMDOWN,DARMUP,DCLAP)
+            self.dancemove(DLEFT, DFORWARD, DBACK, DRIGHT, DRIGHT, DFORWARD, DBACK, DLEFT, DARMDOWN, DARMUP, DCLAP, DSPIN, DTOOT, DTOOT)
 	    #self.dancemove(DARMUP, DARMDOWN, DCLAP)
         # stop light show when done
         stop_thread(ledthread)
@@ -361,7 +368,7 @@ if __name__ == '__main__':
                             display.show(1, "CLOSE")
                             myshow.myservo.setServoPwm(HAND, HANDEND)
                         elif event.code == CONFIG:
-                            display.show(1, "LIGHT on/off")
+                            display.show(1, "LIGHT on-off")
                             headlight.toggle()
                         elif event.code == ESCAPE:
                             display.show(1, "AUTO END")
