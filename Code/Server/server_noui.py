@@ -42,7 +42,7 @@ STARTLIGHT = 38
 
 
 ARMSTART = 150 
-ARMEND = 50
+ARMEND = 35
 HANDSTART = 25 
 HANDEND = 100
 
@@ -273,14 +273,14 @@ if __name__ == '__main__':
                                 curarmangle = curarmangle + 5
                                 myservo.setServoPwm(ARM, curarmangle)
                         elif event.code == VDOWN:
-                            display.show(1,"Arm low")
+                            display.show(1,"Arm down")
                             if curarmangle >= ARMEND + 5:
                                 curarmangle = curarmangle - 5
                                 myservo.setServoPwm(ARM, curarmangle)
                         elif event.code == PLAY:
-                            display.show(1,"Arm down")
-                            curarmangle = ARMEND
-                            myservo.setServoPwm(ARM,ARMEND)
+                            display.show(1,"Arm rest")
+                            curarmangle = (ARMSTART + ARMEND)/2
+                            myservo.setServoPwm(ARM,curarmangle)
                         elif event.code == PREV:
                             display.show(1,"OPEN")
                             myservo.setServoPwm(HAND, HANDSTART)
