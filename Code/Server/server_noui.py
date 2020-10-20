@@ -5,7 +5,7 @@ import struct
 import time
 import threading
 import picamera
-import sys,getopt
+import sys, getopt
 import RPi.GPIO as GPIO
 from threading import Thread
 from Thread import *
@@ -18,6 +18,7 @@ from Ultrasonic import *
 from ADC import *
 from servo import *
 from gpiozero import LED
+from Led import Led
 from TailLight import TailLight
 from SevenSegDisplay import SevenSegDisplay
 
@@ -36,10 +37,10 @@ PREV = 165
 NEXT = 163
 CONFIG = 171
 ESCAPE = 1
+DANCE = 24
 STARTAUTO = 22
 STARTLINE = 23
 STARTLIGHT = 38
-
 
 ARMSTART = 150 
 ARMEND = 35
@@ -52,15 +53,29 @@ RIGHTGREENPIN = 21
 LEFTREDPIN = 26
 RIGHTREDPIN = 20
 
+# # Dance moves
+DLEFT = 101
+DRIGHT = 102
+DSPIN = 103
+DFORWARD = 104
+DBACK = 105
+DARMUP = 106
+DARMDOWN = 107
+DCLAP = 108
+DSPEED = 1  # speed of each move in seconds
+
+
 class myapp():
     
-    def __init__(self, motor=None, headlight=None, taillight = None, buzzer = None):
-        self.PWM=motor
-        self.serverup=False
-        self.automode=False
+    def __init__(self, motor=None, headlight=None, taillight=None, buzzer=None):
+        self.PWM = motor
+        self.serverup = False
+        self.automode = False
         self.taillight = taillight
-        self.TCP_Server=Server(motor, headlight, taillight, buzzer)
+        self.TCP_Server = Server(motor, headlight, taillight, buzzer)
         self.adc = Adc()
+        self.led = Led()
+        myservo = Servo()
         print "Initializing..."
         self.on_pushButton()
                         
@@ -83,19 +98,19 @@ class myapp():
         os._exit(0)
     
     def on_pushButton(self):
-        if self.serverup==False:
+        if self.serverup == False:
             self.TCP_Server.tcp_Flag = True
             print "Open TCP"
             self.TCP_Server.StartTcpServer()
-            self.SendVideo=Thread(target=self.TCP_Server.sendvideo)
-            self.ReadData=Thread(target=self.TCP_Server.readdata)
-            self.power=Thread(target=self.TCP_Server.Power)
+            self.SendVideo = Thread(target=self.TCP_Server.sendvideo)
+            self.ReadData = Thread(target=self.TCP_Server.readdata)
+            self.power = Thread(target=self.TCP_Server.Power)
             self.SendVideo.start()
             self.ReadData.start()
             self.power.start()
             self.serverup = True
             
-        elif self.serverup==True:
+        elif self.serverup == True:
             self.TCP_Server.tcp_Flag = False
             try:
                 stop_thread(self.ReadData)
@@ -105,7 +120,7 @@ class myapp():
                 pass
             
             self.TCP_Server.StopTcpServer()
-            self.serverup=False
+            self.serverup = False
             print "Close TCP"
  
     def run_light_thread(self):
@@ -120,6 +135,10 @@ class myapp():
         self.automode = True
         threading.Thread(target=self.run_ultrasonic).start()
         
+    def run_dance_thread(self):
+        self.automode = True
+        threading.Thread(target=self.run_dance).start()    
+    
     # Event types
     # 0 - d < x
     # 1 - d >= x
@@ -162,7 +181,6 @@ class myapp():
             cur_state = ttable[cur_state][e]
             
         print "Auto drive End!"
-        
             
     def run_line(self):
         IR01 = 14
@@ -170,69 +188,117 @@ class myapp():
         IR03 = 23
         print "Line Follow Start!"
         GPIO.setmode(GPIO.BCM)
-        GPIO.setup(IR01,GPIO.IN)
-        GPIO.setup(IR02,GPIO.IN)
-        GPIO.setup(IR03,GPIO.IN)
+        GPIO.setup(IR01, GPIO.IN)
+        GPIO.setup(IR02, GPIO.IN)
+        GPIO.setup(IR03, GPIO.IN)
         while self.automode:
-            self.LMR=0x00
-            if GPIO.input(IR01)==True:
-                self.LMR=(self.LMR | 4)
-            if GPIO.input(IR02)==True:
-                self.LMR=(self.LMR | 2)
-            if GPIO.input(IR03)==True:
-                self.LMR=(self.LMR | 1)
-            if self.LMR==2:
-                self.PWM.setMotorModel(800,800,800,800)
-            elif self.LMR==4:
-                self.PWM.setMotorModel(-1500,-1500,2500,2500)
-            elif self.LMR==6:
-                self.PWM.setMotorModel(-2000,-2000,4000,4000)
-            elif self.LMR==1:
-                self.PWM.setMotorModel(2500,2500,-1500,-1500)
-            elif self.LMR==3:
-                self.PWM.setMotorModel(4000,4000,-2000,-2000)
-            elif self.LMR==7:
+            self.LMR = 0x00
+            if GPIO.input(IR01) == True:
+                self.LMR = (self.LMR | 4)
+            if GPIO.input(IR02) == True:
+                self.LMR = (self.LMR | 2)
+            if GPIO.input(IR03) == True:
+                self.LMR = (self.LMR | 1)
+            if self.LMR == 2:
+                self.PWM.setMotorModel(800, 800, 800, 800)
+            elif self.LMR == 4:
+                self.PWM.setMotorModel(-1500, -1500, 2500, 2500)
+            elif self.LMR == 6:
+                self.PWM.setMotorModel(-2000, -2000, 4000, 4000)
+            elif self.LMR == 1:
+                self.PWM.setMotorModel(2500, 2500, -1500, -1500)
+            elif self.LMR == 3:
+                self.PWM.setMotorModel(4000, 4000, -2000, -2000)
+            elif self.LMR == 7:
                 pass
         print "Line Follow End!"
             
     def run_light(self):
         print "Light follow start!"
-        self.PWM.setMotorModel(0,0,0,0)
+        self.PWM.setMotorModel(0, 0, 0, 0)
         while self.automode:
             L = self.adc.recvADC(0)
             R = self.adc.recvADC(1)
             if L < 2.99 and R < 2.99 :
-                self.PWM.setMotorModel(600,600,600,600)
+                self.PWM.setMotorModel(600, 600, 600, 600)
                 
-            elif abs(L-R)<0.15:
-                self.PWM.setMotorModel(0,0,0,0)
+            elif abs(L - R) < 0.15:
+                self.PWM.setMotorModel(0, 0, 0, 0)
                 
             elif L > 3 or R > 3:
                 if L > R :
-                    self.PWM.setMotorModel(-1200,-1200,1400,1400)
+                    self.PWM.setMotorModel(-1200, -1200, 1400, 1400)
                     
                 elif R > L :
-                    self.PWM.setMotorModel(1400,1400,-1200,-1200)
+                    self.PWM.setMotorModel(1400, 1400, -1200, -1200)
         print "Light follow finished!"
+    
+    def dancemove(self, *args):
+        for move in args:
+            if move == DLEFT:
+                self.PWM.turnLeft()
+                time.sleep(DSPEED)
+                self.PWM.stopMotor()
+            elif move == DRIGHT:
+                self.PWM.turnRight()
+                time.sleep(DSPEED)
+                self.PWM.stopMotor()
+            if move == DSPIN:
+                self.PWM.turnLeft()
+                time.sleep(DSPEED * 2)
+                self.PWM.stopMotor()
+            elif move == DFORWARD:
+                self.PWM.slowforward()
+                time.sleep(DSPEED)
+                self.PWM.stopMotor()
+            elif move == DBACK:
+                self.PWM.slowBackup()
+                time.sleep(DSPEED)
+                self.PWM.stopMotor()
+            elif move == DARMUP:
+                self.myservo.setServoPwm(ARM, (ARMSTART + ARMEND) * 2 / 3)
+                time.sleep(DSPEED / 2)
+            elif move == DARMDOWN:
+                self.myservo.setServoPwm(ARM, (ARMSTART + ARMEND) * 2 / 3)
+                time.sleep(DSPEED / 2)
+            elif move == DCLAP:
+                self.myservo.setServoPwm(HAND, HANDEND)
+                time.sleep(DSPEED / 2)
+                self.myservo.setServoPwm(HAND, HANDSTART)
+            else:
+                print "Invalid dance move?"
             
+    def run_dance(self):
+        print "Dance moves"
+        self.PWM.setMotorModel(0, 0, 0, 0)
+        # start light show
+        mode = str(random.randint(1, 4))
+        ledthread = Thread(target=self.led.ledMode, args=(mode,))
+        ledthread.start()
+        while self.automode:
+            self.dancemove(DLEFT, DFORWARD, DBACK, DRIGHT, DRIGHT, DFORWARD, DBACK, DLEFT)
+        # stop light show when done
+        stop_thread(ledthread)
+        print "Dance moves finished"
+
+
 if __name__ == '__main__':
-    devices = map(InputDevice, ('/dev/input/event0','/dev/input/event3'))
+    devices = map(InputDevice, ('/dev/input/event0', '/dev/input/event3'))
     devices = {dev.fd: dev for dev in devices}
     for dev in devices.values(): 
          print(dev)
     buzzer = Buzzer()
-    myservo=Servo()
     curarmangle = ARMSTART
     curhandangle = HANDSTART
-    myservo.setServoPwm(ARM,curarmangle)
-    myservo.setServoPwm(HAND,curhandangle)
-    headlight=LED(HEADLIGHTPIN)
+    self.myservo.setServoPwm(ARM, curarmangle)
+    self.myservo.setServoPwm(HAND, curhandangle)
+    headlight = LED(HEADLIGHTPIN)
     taillight = TailLight(LEFTREDPIN, LEFTGREENPIN, RIGHTREDPIN, RIGHTGREENPIN)
     display = SevenSegDisplay()
-    display.show(0,"Ishani's robot")
+    display.show(0, "Ishani's robot")
     
-    PWM=Motor(taillight)
-    myshow=myapp(PWM, headlight, taillight, buzzer)
+    PWM = Motor(taillight)
+    myshow = myapp(PWM, headlight, taillight, buzzer)
     
     sdcount = 0
     try:
@@ -241,75 +307,78 @@ if __name__ == '__main__':
            for fd in r:
               for event in devices[fd].read():
                 if event.type == ecodes.EV_KEY:
-                    if event.value == 0: # release stop
+                    if event.value == 0:  # release stop
                         if event.code != 57:
                             if PWM.moving and not(myshow.automode):
-			    	PWM.stopMotor() # This will turn on the taillight
-                            	display.show(1,"Stop")
+			    	PWM.stopMotor()  # This will turn on the taillight
+                            	display.show(1, "Stop")
                             buzzer.run('0')
                             sdcount = 0
-                    elif event.value == 1: # press - start
+                    elif event.value == 1:  # press - start
                         if event.code == UP:
                             PWM.forward()
-                            display.show(1,"Forward")
+                            display.show(1, "Forward")
                         elif event.code == DOWN:
                             PWM.backup()
-                            display.show(1,"Backward")
+                            display.show(1, "Backward")
                         elif event.code == LEFT:
                             PWM.turnLeft()
-                            display.show(1,"LEFT")
+                            display.show(1, "LEFT")
                         elif event.code == RIGHT:
                             PWM.turnRight()
-                            display.show(1,"RIGHT")
+                            display.show(1, "RIGHT")
                         elif event.code == SPACE:
                             myshow.on_pushButton()
-                            display.show(1,"Server start-stop")
+                            display.show(1, "Server start-stop")
                         elif event.code == OK:
                             buzzer.run('1') 
-                            display.show(1,"Horn!")
+                            display.show(1, "Horn!")
                         elif event.code == VUP:
-                            display.show(1,"Arm up")
+                            display.show(1, "Arm up")
                             if curarmangle <= ARMSTART - 5:
                                 curarmangle = curarmangle + 5
-                                myservo.setServoPwm(ARM, curarmangle)
+                                self.myservo.setServoPwm(ARM, curarmangle)
                         elif event.code == VDOWN:
-                            display.show(1,"Arm down")
+                            display.show(1, "Arm down")
                             if curarmangle >= ARMEND + 5:
                                 curarmangle = curarmangle - 5
-                                myservo.setServoPwm(ARM, curarmangle)
+                                self.myservo.setServoPwm(ARM, curarmangle)
                         elif event.code == PLAY:
-                            display.show(1,"Arm rest")
-                            curarmangle = (ARMSTART + ARMEND)/2
-                            myservo.setServoPwm(ARM,curarmangle)
+                            display.show(1, "Arm rest")
+                            curarmangle = (ARMSTART + ARMEND) / 2
+                            self.myservo.setServoPwm(ARM, curarmangle)
                         elif event.code == PREV:
-                            display.show(1,"OPEN")
-                            myservo.setServoPwm(HAND, HANDSTART)
+                            display.show(1, "OPEN")
+                            self.myservo.setServoPwm(HAND, HANDSTART)
                         elif event.code == NEXT:
-                            display.show(1,"CLOSE")
-                            myservo.setServoPwm(HAND, HANDEND)
+                            display.show(1, "CLOSE")
+                            self.myservo.setServoPwm(HAND, HANDEND)
                         elif event.code == CONFIG:
-                            display.show(1,"LIGHT on/off")
+                            display.show(1, "LIGHT on/off")
                             headlight.toggle()
                         elif event.code == ESCAPE:
-                            display.show(1,"AUTO END")
+                            display.show(1, "AUTO END")
                             myshow.automode = False
                         elif event.code == STARTAUTO:
-                            display.show(1,"AUTO START")
+                            display.show(1, "AUTO START")
                             myshow.run_ultrasonic_thread()
                         elif event.code == STARTLINE:
-                            display.show(1,"Starting line follow")
+                            display.show(1, "LINE START")
                             myshow.run_line_thread()
                         elif event.code == STARTLIGHT:
-                            display.show(1,"Starting light follow")
+                            display.show(1, "LIGHT START")
                             myshow.run_light_thread()
+                        elif event.code == DANCE:
+                            display.show(1, "DANCE!")
+                            myshow.run_dance_thread()
                         else:
-                            display.show(1,"UNKNOWN KEY")
+                            display.show(1, "UNKNOWN KEY")
                             print(categorize(event))
-                    elif event.value == 2: # Holding - long press processing
-                        if event.code == 57: # long press play/pause button
+                    elif event.value == 2:  # Holding - long press processing
+                        if event.code == 57:  # long press play/pause button
                             sdcount = sdcount + 1
     		if sdcount > 30:
-                    display.show(1,"POWER OFF")
+                    display.show(1, "POWER OFF")
                     os.system("sudo poweroff")
     except KeyboardInterrupt:
         myshow.close()

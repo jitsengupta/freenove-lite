@@ -100,6 +100,10 @@ class Motor:
         self.setMotorModel(-1000,-1000,-1000,-1000)
 	self.moving = True
  
+    def slowBackup(self):
+        self.setMotorModel(-700,-700,-700,-700)
+    self.moving = True
+
     def setMotorModel(self,duty1,duty2,duty3,duty4):
         duty1,duty2,duty3,duty4=self.duty_range(duty1,duty2,duty3,duty4)
         self.left_Upper_Wheel(-duty1)
