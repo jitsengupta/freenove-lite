@@ -288,7 +288,8 @@ class myapp():
         ledthread = Thread(target=self.led.ledMode, args=(mode,))
         ledthread.start()
         while self.automode:
-            self.dancemove(DLEFT, DFORWARD, DBACK, DRIGHT, DRIGHT, DFORWARD, DBACK, DLEFT, DARMDOWN, DARMUP, DCLAP, DSPIN, DTOOT, DTOOT)
+            self.dancemove(DLEFT, DBACK, DFORWARD, DBACK, DARMDOWN, DARMUP, DCLAP, DSPIN, DTOOT, DTOOT, 
+                           DRIGHT, DBACK, DFORWARD, DBACK, DARMDOWN, DARMUP, DCLAP, DSPIN, DTOOT, DTOOT)
 	    #self.dancemove(DARMUP, DARMDOWN, DCLAP)
         # stop light show when done
         stop_thread(ledthread)
