@@ -39,10 +39,11 @@ PREV = 165
 NEXT = 163
 CONFIG = 171
 ESCAPE = 1
-DANCE = 32
-STARTAUTO = 22
-STARTLINE = 23
-STARTLIGHT = 38
+DANCE = 32  # D
+STARTAUTO = 22  # U
+STARTLINE = 23  # I
+STARTLIGHT = 38 # L
+THROW = 35   # T
 
 ARMSTART = 150 
 ARMEND = 35
@@ -358,6 +359,11 @@ if __name__ == '__main__':
                             if curarmangle >= ARMEND + 5:
                                 curarmangle = curarmangle - 5
                                 myshow.myservo.setServoPwm(ARM, curarmangle)
+                        elif event.code == THROW:
+                            display.show(1, "Throw")
+                            curangle = ARMSTART
+                            myshow.myservo.setServoPwm(ARM, curarmangle)
+                            myshow.myservo.setServoPwm(HAND, HANDSTART)
                         elif event.code == PLAY:
                             display.show(1, "Arm rest")
                             curarmangle = (ARMSTART + ARMEND) / 2
