@@ -43,12 +43,12 @@ DANCE = 32  # D
 STARTAUTO = 22  # U
 STARTLINE = 23  # I
 STARTLIGHT = 38 # L
-THROW = 35   # T
+THROW = 20   # T
 
 ARMSTART = 150 
 ARMEND = 35
 HANDSTART = 25 
-HANDEND = 100
+HANDEND = 105
 
 HEADLIGHTPIN = 16
 LEFTGREENPIN = 21
@@ -361,8 +361,9 @@ if __name__ == '__main__':
                                 myshow.myservo.setServoPwm(ARM, curarmangle)
                         elif event.code == THROW:
                             display.show(1, "Throw")
-                            curangle = ARMSTART
+                            curarmangle = ARMSTART
                             myshow.myservo.setServoPwm(ARM, curarmangle)
+                	    time.sleep(0.1)
                             myshow.myservo.setServoPwm(HAND, HANDSTART)
                         elif event.code == PLAY:
                             display.show(1, "Arm rest")
