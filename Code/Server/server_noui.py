@@ -44,9 +44,12 @@ STARTAUTO = 22  # U
 STARTLINE = 23  # I
 STARTLIGHT = 38 # L
 THROW = 20   # T
+SHAKE = 19   # S
 
 ARMSTART = 150 
 ARMEND = 35
+SHAKESTART = 130
+SHAKEEND = 100
 HANDSTART = 25 
 HANDEND = 105
 
@@ -364,6 +367,23 @@ if __name__ == '__main__':
                             curarmangle = ARMSTART
                             myshow.myservo.setServoPwm(ARM, curarmangle)
                 	    time.sleep(0.1)
+                            myshow.myservo.setServoPwm(HAND, HANDSTART)
+                        elif event.code == SHAKE:
+                            display.show(1, "Shake")
+                            curangle = SHAKESTART
+                            myshow.myservo.setServoPwm(ARM, curarmangle)
+                            myshow.myservo.setServoPwm(HAND, HANDSTART)
+                            time.sleep(1)
+                            myshow.myservo.setServoPwm(HAND, HANDEND)
+                            time.sleep(0.5)
+                            myshow.myservo.setServoPwm(ARM, SHAKEEND)
+                            time.sleep(0.5)
+                            myshow.myservo.setServoPwm(ARM, SHAKESTART)
+                            time.sleep(0.5)
+                            myshow.myservo.setServoPwm(ARM, SHAKEEND)
+                            time.sleep(0.5)
+                            myshow.myservo.setServoPwm(ARM, SHAKESTART)
+                            time.sleep(0.5)
                             myshow.myservo.setServoPwm(HAND, HANDSTART)
                         elif event.code == PLAY:
                             display.show(1, "Arm rest")
