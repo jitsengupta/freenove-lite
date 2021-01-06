@@ -45,11 +45,13 @@ STARTLINE = 23  # I
 STARTLIGHT = 38 # L
 THROW = 20   # T
 SHAKE = 19   # S
+HIFIVE = 22  # H
 
 ARMSTART = 150 
 ARMEND = 35
 SHAKESTART = 130
 SHAKEEND = 100
+HIFIVEEND = 130
 HANDSTART = 25 
 HANDEND = 105
 
@@ -366,8 +368,15 @@ if __name__ == '__main__':
                             display.show(1, "Throw")
                             curarmangle = ARMSTART
                             myshow.myservo.setServoPwm(ARM, curarmangle)
-                	    time.sleep(0.1)
+                            time.sleep(0.1)
                             myshow.myservo.setServoPwm(HAND, HANDSTART)
+                        elif event.code == HIFIVE:
+                            display.show(1, "Highfive")
+                            curangle = HIFIVEEND
+                            myshow.myservo.setServoPwm(HAND, HANDSTART)
+                            myshow.myservo.setServoPwm(ARM, ARMSTART)
+                            time.sleep(2)
+                            myshow.myservo.setServoPwm(ARM,HIFIVEEND)
                         elif event.code == SHAKE:
                             display.show(1, "Shake")
                             curangle = SHAKESTART
