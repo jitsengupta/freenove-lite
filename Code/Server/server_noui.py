@@ -44,12 +44,14 @@ STARTAUTO = 22  # U
 STARTLINE = 23  # I
 STARTLIGHT = 38 # L
 THROW = 20   # T
-SHAKE = 19   # S
-HIFIVE = 22  # H
+SHAKE = 31   # S
+HIFIVE = 35  # H
 
 ARMSTART = 150 
 ARMEND = 35
 SHAKESTART = 130
+SHAKE2 = 120
+SHAKE1 = 110
 SHAKEEND = 100
 HIFIVEEND = 130
 HANDSTART = 25 
@@ -384,6 +386,8 @@ if __name__ == '__main__':
                             myshow.myservo.setServoPwm(HAND, HANDSTART)
                             time.sleep(1)
                             myshow.myservo.setServoPwm(HAND, HANDEND)
+                            time.sleep(0.5)
+                            myshow.myservo.setServoPwm(ARM, SHAKEEND)
                             time.sleep(0.5)
                             myshow.myservo.setServoPwm(ARM, SHAKEEND)
                             time.sleep(0.5)
