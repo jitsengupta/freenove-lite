@@ -316,7 +316,7 @@ if __name__ == '__main__':
     headlight = LED(HEADLIGHTPIN)
     taillight = TailLight(LEFTREDPIN, LEFTGREENPIN, RIGHTREDPIN, RIGHTGREENPIN)
     display = SevenSegDisplay()
-    display.show(0, "Ishani's robot")
+    display.show(0, "WELCOME MSIS STUDENTS")
     
     PWM = Motor(taillight)
     myshow = myapp(PWM, headlight, taillight, buzzer)
