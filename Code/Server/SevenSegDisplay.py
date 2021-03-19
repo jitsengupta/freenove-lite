@@ -13,7 +13,7 @@ class SevenSegDisplay:
         # create seven segment device
         self.serial = spi(port=0, device=0, gpio=noop())
         self.device = max7219(self.serial, cascaded=1)
-	self.device.contrast(5)
+	self.device.contrast(200)
         self.seg = sevensegment(self.device)
         self.scroll_thread = None        
         

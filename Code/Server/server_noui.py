@@ -205,22 +205,22 @@ class myapp():
         GPIO.setup(IR03, GPIO.IN)
         while self.automode:
             self.LMR = 0x00
-            if GPIO.input(IR01) == True:
+            if GPIO.input(IR01) == False:
                 self.LMR = (self.LMR | 4)
-            if GPIO.input(IR02) == True:
+            if GPIO.input(IR02) == False:
                 self.LMR = (self.LMR | 2)
-            if GPIO.input(IR03) == True:
+            if GPIO.input(IR03) == False:
                 self.LMR = (self.LMR | 1)
             if self.LMR == 2:
                 self.PWM.setMotorModel(800, 800, 800, 800)
             elif self.LMR == 4:
                 self.PWM.setMotorModel(-1500, -1500, 2500, 2500)
-            elif self.LMR == 6:
-                self.PWM.setMotorModel(-2000, -2000, 4000, 4000)
+            elif self.LMR == 3:
+                self.PWM.setMotorModel(-2000, -2000, 3000, 3000)
             elif self.LMR == 1:
                 self.PWM.setMotorModel(2500, 2500, -1500, -1500)
-            elif self.LMR == 3:
-                self.PWM.setMotorModel(4000, 4000, -2000, -2000)
+            elif self.LMR == 6:
+                self.PWM.setMotorModel(3000, 3000, -2000, -2000)
             elif self.LMR == 7:
                 pass
         print "Line Follow End!"
