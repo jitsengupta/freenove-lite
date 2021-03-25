@@ -88,6 +88,7 @@ class myapp():
         self.led = Led()
         self.buzzer = buzzer
         self.myservo = Servo()
+        self.display = SevenSegDisplay()
         print "Initializing..."
         self.on_pushButton()
                         
@@ -166,20 +167,26 @@ class myapp():
         
         while self.automode:
             if cur_state == 0:
+                self.display.show(1, "FORWARD")
                 self.PWM.slowforward()
                 ultra.look_forward()
             elif cur_state == 1:
+                self.display.show(1, "LOOKLEFT")
                 self.PWM.stopMotor()
                 ultra.look_left()
             elif cur_state == 2:
+                self.display.show(1, "LOOKRITE")
                 self.PWM.stopMotor()
                 ultra.look_right()
             elif cur_state == 3:
+                self.display.show(1, "GOBACK")
                 self.PWM.backup()
             elif cur_state == 4:
+                self.display.show(1, "TURNLEFT")
                 self.PWM.turnLeft()
                 time.sleep(0.2)
             elif cur_state == 5:
+                self.display.show(1, "TURNRITE")
                 self.PWM.turnRight()
                 time.sleep(0.2)
             else:
@@ -212,14 +219,19 @@ class myapp():
             if GPIO.input(IR03) == False:
                 self.LMR = (self.LMR | 1)
             if self.LMR == 2:
+                self.display.show(1, "FORWARD")
                 self.PWM.setMotorModel(800, 800, 800, 800)
             elif self.LMR == 4:
+                self.display.show(1, "TURNLEFT")
                 self.PWM.setMotorModel(-1000, -1000, 1500, 1500)
             elif self.LMR == 3:
+                self.display.show(1, "FASTLEFT")
                 self.PWM.setMotorModel(-1500, -1500, 2000, 2000)
             elif self.LMR == 1:
+                self.display.show(1, "TURNRIGHT")
                 self.PWM.setMotorModel(1500, 1500, -1000, -1000)
             elif self.LMR == 6:
+                self.display.show(1, "FASTRITE")
                 self.PWM.setMotorModel(2000, 2000, -1500, -1500)
             elif self.LMR == 7:
                 pass
@@ -232,16 +244,20 @@ class myapp():
             L = self.adc.recvADC(0)
             R = self.adc.recvADC(1)
             if L < 2.99 and R < 2.99 :
+                self.display.show(1, "FORWARD")
                 self.PWM.setMotorModel(1000, 1000, 1000, 1000)
                 
             elif abs(L - R) < 0.15:
+                self.display.show(1, "STOP")
                 self.PWM.setMotorModel(0, 0, 0, 0)
                 
             elif L > 3 or R > 3:
                 if L > R :
+                    self.display.show(1, "TURNLEFT")
                     self.PWM.setMotorModel(-1500, -1500, 2000, 2000)
                     
                 elif R > L :
+                    self.display.show(1, "TURNRITE")
                     self.PWM.setMotorModel(2000, 2000, -1500, -1500)
         print "Light follow finished!"
     
@@ -315,8 +331,7 @@ if __name__ == '__main__':
     curhandangle = HANDSTART
     headlight = LED(HEADLIGHTPIN)
     taillight = TailLight(LEFTREDPIN, LEFTGREENPIN, RIGHTREDPIN, RIGHTGREENPIN)
-    display = SevenSegDisplay()
-    display.show(0, "WELCOME MSIS STUDENTS")
+    self.display.show(0, "WELCOME MSIS STUDENTS")
     
     PWM = Motor(taillight)
     myshow = myapp(PWM, headlight, taillight, buzzer)
@@ -334,53 +349,53 @@ if __name__ == '__main__':
                         if event.code != 57:
                             if PWM.moving and not(myshow.automode):
 			    	PWM.stopMotor()  # This will turn on the taillight
-                            	display.show(1, "Stop")
+                            	self.display.show(1, "Stop")
                             buzzer.run('0')
                             sdcount = 0
                     elif event.value == 1:  # press - start
                         if event.code == UP:
                             PWM.forward()
-                            display.show(1, "Forward")
+                            self.display.show(1, "Forward")
                         elif event.code == DOWN:
                             PWM.backup()
-                            display.show(1, "Backward")
+                            self.display.show(1, "Backward")
                         elif event.code == LEFT:
                             PWM.turnLeft()
-                            display.show(1, "LEFT")
+                            self.display.show(1, "LEFT")
                         elif event.code == RIGHT:
                             PWM.turnRight()
-                            display.show(1, "RIGHT")
+                            self.display.show(1, "RIGHT")
                         elif event.code == SPACE:
                             myshow.on_pushButton()
-                            display.show(1, "Server start-stop")
+                            self.display.show(1, "Server start-stop")
                         elif event.code == OK:
                             buzzer.run('1') 
-                            display.show(1, "Horn!")
+                            self.display.show(1, "Horn!")
                         elif event.code == VUP:
-                            display.show(1, "Arm up")
+                            self.display.show(1, "Arm up")
                             if curarmangle <= ARMSTART - 5:
                                 curarmangle = curarmangle + 5
                                 myshow.myservo.setServoPwm(ARM, curarmangle)
                         elif event.code == VDOWN:
-                            display.show(1, "Arm down")
+                            self.display.show(1, "Arm down")
                             if curarmangle >= ARMEND + 5:
                                 curarmangle = curarmangle - 5
                                 myshow.myservo.setServoPwm(ARM, curarmangle)
                         elif event.code == THROW:
-                            display.show(1, "Throw")
+                            self.display.show(1, "Throw")
                             curarmangle = ARMSTART
                             myshow.myservo.setServoPwm(ARM, curarmangle)
                             time.sleep(0.1)
                             myshow.myservo.setServoPwm(HAND, HANDSTART)
                         elif event.code == HIFIVE:
-                            display.show(1, "Highfive")
+                            self.display.show(1, "Highfive")
                             curangle = HIFIVEEND
                             myshow.myservo.setServoPwm(HAND, HANDSTART)
                             myshow.myservo.setServoPwm(ARM, ARMSTART)
                             time.sleep(2)
                             myshow.myservo.setServoPwm(ARM,HIFIVEEND)
                         elif event.code == SHAKE:
-                            display.show(1, "Shake")
+                            self.display.show(1, "Shake")
                             curangle = SHAKESTART
                             myshow.myservo.setServoPwm(ARM, curarmangle)
                             myshow.myservo.setServoPwm(HAND, HANDSTART)
@@ -413,41 +428,44 @@ if __name__ == '__main__':
                             time.sleep(0.5)
                             myshow.myservo.setServoPwm(HAND, HANDSTART)
                         elif event.code == PLAY:
-                            display.show(1, "Arm rest")
+                            self.display.show(1, "Arm rest")
                             curarmangle = (ARMSTART + ARMEND) / 2
                             myshow.myservo.setServoPwm(ARM, curarmangle)
                         elif event.code == PREV:
-                            display.show(1, "OPEN")
+                            self.display.show(1, "OPEN")
                             myshow.myservo.setServoPwm(HAND, HANDSTART)
                         elif event.code == NEXT:
-                            display.show(1, "CLOSE")
+                            self.display.show(1, "CLOSE")
                             myshow.myservo.setServoPwm(HAND, HANDEND)
                         elif event.code == CONFIG:
-                            display.show(1, "LIGHT on-off")
+                            self.display.show(1, "LIGHT on-off")
                             headlight.toggle()
                         elif event.code == ESCAPE:
-                            display.show(1, "AUTO END")
+                            self.display.show(1, "AUTO END")
                             myshow.automode = False
                         elif event.code == STARTAUTO:
-                            display.show(1, "AUTO START")
+                            self.display.show(1, "AUTOMODE")
+                            time.sleep(3)
                             myshow.run_ultrasonic_thread()
                         elif event.code == STARTLINE:
-                            display.show(1, "LINE START")
+                            self.display.show(1, "PATHMODE")
+                            time.sleep(3)
                             myshow.run_line_thread()
                         elif event.code == STARTLIGHT:
-                            display.show(1, "LIGHT START")
+                            self.display.show(1, "LITEMODE")
+                            time.sleep(3)
                             myshow.run_light_thread()
                         elif event.code == DANCE:
-                            display.show(1, "DANCE!")
+                            self.display.show(1, "DANCE")
                             myshow.run_dance_thread()
                         else:
-                            display.show(1, "UNKNOWN KEY")
+                            self.display.show(1, "UNKNOWN KEY")
                             print(categorize(event))
                     elif event.value == 2:  # Holding - long press processing
                         if event.code == 57:  # long press play/pause button
                             sdcount = sdcount + 1
     		if sdcount > 30:
-                    display.show(1, "POWER OFF")
+                    self.display.show(1, "POWER OFF")
                     os.system("sudo poweroff")
     except KeyboardInterrupt:
         myshow.close()
