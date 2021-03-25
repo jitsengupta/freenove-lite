@@ -55,7 +55,7 @@ SHAKE1 = 110
 SHAKEEND = 100
 HIFIVEEND = 130
 HANDSTART = 25 
-HANDEND = 105
+HANDEND = 120
 
 HEADLIGHTPIN = 16
 LEFTGREENPIN = 21
@@ -214,13 +214,13 @@ class myapp():
             if self.LMR == 2:
                 self.PWM.setMotorModel(800, 800, 800, 800)
             elif self.LMR == 4:
-                self.PWM.setMotorModel(-1500, -1500, 2500, 2500)
+                self.PWM.setMotorModel(-1000, -1000, 1500, 1500)
             elif self.LMR == 3:
-                self.PWM.setMotorModel(-2000, -2000, 3000, 3000)
+                self.PWM.setMotorModel(-1500, -1500, 2000, 2000)
             elif self.LMR == 1:
-                self.PWM.setMotorModel(2500, 2500, -1500, -1500)
+                self.PWM.setMotorModel(1500, 1500, -1000, -1000)
             elif self.LMR == 6:
-                self.PWM.setMotorModel(3000, 3000, -2000, -2000)
+                self.PWM.setMotorModel(2000, 2000, -1500, -1500)
             elif self.LMR == 7:
                 pass
         print "Line Follow End!"
@@ -232,17 +232,17 @@ class myapp():
             L = self.adc.recvADC(0)
             R = self.adc.recvADC(1)
             if L < 2.99 and R < 2.99 :
-                self.PWM.setMotorModel(600, 600, 600, 600)
+                self.PWM.setMotorModel(1000, 1000, 1000, 1000)
                 
             elif abs(L - R) < 0.15:
                 self.PWM.setMotorModel(0, 0, 0, 0)
                 
             elif L > 3 or R > 3:
                 if L > R :
-                    self.PWM.setMotorModel(-1200, -1200, 1400, 1400)
+                    self.PWM.setMotorModel(-1500, -1500, 2000, 2000)
                     
                 elif R > L :
-                    self.PWM.setMotorModel(1400, 1400, -1200, -1200)
+                    self.PWM.setMotorModel(2000, 2000, -1500, -1500)
         print "Light follow finished!"
     
     def dancemove(self, *args):
