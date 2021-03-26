@@ -158,6 +158,13 @@ class myapp():
     # 2 - l > r   - for future enhancement not using in first try
     # 3 - l <= r  - ditto
     def run_ultrasonic(self):
+        IR01 = 14
+        IR02 = 15
+        IR03 = 23
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(IR01, GPIO.IN)
+        GPIO.setup(IR02, GPIO.IN)
+        GPIO.setup(IR03, GPIO.IN)
         ttable = [[1, 0], [2, 4], [3, 5], [1, 1], [0, 0], [0, 0]]
         x = 40
         ultra = Ultrasonic()
@@ -195,7 +202,15 @@ class myapp():
 
             time.sleep(0.3)
             d = ultra.get_distance()
-            
+            self.LMR = 0x00
+            if GPIO.input(IR01) == False:
+                self.LMR = (self.LMR | 4)
+            if GPIO.input(IR02) == False:
+                self.LMR = (self.LMR | 2)
+            if GPIO.input(IR03) == False:
+                self.LMR = (self.LMR | 1)
+            if (self.LMR > 0 and self.LMR < 7):
+                d = 0
             e = 0 if d < x else 1
             cur_state = ttable[cur_state][e]
             
