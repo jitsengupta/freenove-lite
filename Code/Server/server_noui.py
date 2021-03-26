@@ -165,6 +165,15 @@ class myapp():
         GPIO.setup(IR01, GPIO.IN)
         GPIO.setup(IR02, GPIO.IN)
         GPIO.setup(IR03, GPIO.IN)
+        self.LMR0= 0x00
+        if GPIO.input(IR01) == False:
+            self.LMR0 = (self.LMR0 | 4)
+        if GPIO.input(IR02) == False:
+            self.LMR0 = (self.LMR0 | 2)
+        if GPIO.input(IR03) == False:
+            self.LMR0 = (self.LMR0 | 1)
+	if self.LMR0 > 0:
+	    self.LMR0 = 7
         ttable = [[1, 0], [2, 4], [3, 5], [1, 1], [0, 0], [0, 0]]
         x = 40
         ultra = Ultrasonic()
@@ -200,7 +209,7 @@ class myapp():
                 print "Wrong state?"
                 cur_state = 0
 
-            time.sleep(0.3)
+            time.sleep(0.1)
             d = ultra.get_distance()
             self.LMR = 0x00
             if GPIO.input(IR01) == False:
@@ -209,10 +218,11 @@ class myapp():
                 self.LMR = (self.LMR | 2)
             if GPIO.input(IR03) == False:
                 self.LMR = (self.LMR | 1)
-            if (self.LMR > 0 and self.LMR < 7):
-                d = 0
-            e = 0 if d < x else 1
-            cur_state = ttable[cur_state][e]
+            if (self.LMR <> self.LMR0):
+                cur_state = 3
+	    else:
+                e = 0 if d < x else 1
+                cur_state = ttable[cur_state][e]
             
         print "Auto drive End!"
             
