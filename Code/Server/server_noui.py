@@ -43,7 +43,7 @@ DANCE = 32  # D
 STARTAUTO = 22  # U
 STARTLINE = 23  # I
 STARTLIGHT = 38 # L
-STARTLANE = 28 # A?
+STARTLANE = 30 # A?
 THROW = 20   # T
 SHAKE = 31   # S
 HIFIVE = 35  # H
@@ -248,7 +248,7 @@ class myapp():
         x = 10
         ultra = Ultrasonic()
 
-        ttable = [[0,3,1,2], [0,3,1,2], [0,3,1,2], [0,0,0,0]]
+        ttable = [[0,3,1,2,1], [0,3,1,2,2], [0,3,1,2,1], [0,0,0,0,0]]
         
         print "Lane keep start!"
         
@@ -261,13 +261,14 @@ class myapp():
                 ultra.look_forward()
             elif cur_state == 1:
                 self.display.show(1, "TURNLEFT")
-                self.PWM.setMotorModel(-1000, -1000, 1500, 1500)
+                self.PWM.setMotorModel(-1500, -1500, 1500, 1500)
             elif cur_state == 2:
                 self.display.show(1, "TURNRITE")
-                self.PWM.setMotorModel(1500, 1500, -1000, -1000)
+                self.PWM.setMotorModel(1500, 1500, -1500, -1500)
             else:
-                print "WALL!"
-                self.automode = false
+                self.display.show(1, "WALL!")
+                self.PWM.setMotorModel(0, 0, 0, 0)
+                self.automode = False
 
             time.sleep(0.1)
             d = ultra.get_distance()
@@ -284,12 +285,14 @@ class myapp():
             if d < x:
                 e = 1
             elif self.LMR == 4 or self.LMR == 6:
-                e = 2
-            elif self.LMR == 1 or self.LMR == 3:
                 e = 3
+            elif self.LMR == 1 or self.LMR == 3:
+                e = 2
+            elif self.LMR == 2:
+                e = 4
             
             cur_state = ttable[cur_state][e]
-            print("LMR: " + self.LMR + " Cur state: " + cur_state)
+            print("LMR: " + str(self.LMR) + " Cur state: " + str(cur_state))
             
             
         print "Lane keep End!"

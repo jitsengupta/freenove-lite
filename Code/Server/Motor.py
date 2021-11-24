@@ -86,7 +86,7 @@ class Motor:
         self.moving = True
     
     def slowforward(self):
-        self.setMotorModel(700, 700, 700, 700)
+        self.setMotorModel(650, 650, 650, 650)
         self.moving = True
     
     def forward(self):
