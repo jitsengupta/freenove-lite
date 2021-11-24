@@ -43,6 +43,7 @@ DANCE = 32  # D
 STARTAUTO = 22  # U
 STARTLINE = 23  # I
 STARTLIGHT = 38 # L
+STARTLANE = 28 # A?
 THROW = 20   # T
 SHAKE = 31   # S
 HIFIVE = 35  # H
@@ -152,6 +153,10 @@ class myapp():
         self.automode = True
         threading.Thread(target=self.run_dance).start()    
     
+    def run_lane_thread(self):
+        self.automode = True
+        threading.Thread(target=self.run_lane).start()
+        
     # Event types
     # 0 - d < x
     # 1 - d >= x
@@ -225,6 +230,69 @@ class myapp():
                 cur_state = ttable[cur_state][e]
             
         print "Auto drive End!"
+            
+    # Event types
+    # 0 - d < x
+    # 1 - d >= x
+    # 2 - l > r   - for future enhancement not using in first try
+    # 3 - l <= r  - ditto
+    def run_lane(self):
+        IR01 = 14
+        IR02 = 15
+        IR03 = 23
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(IR01, GPIO.IN)
+        GPIO.setup(IR02, GPIO.IN)
+        GPIO.setup(IR03, GPIO.IN)
+
+        x = 10
+        ultra = Ultrasonic()
+
+        ttable = [[0,3,1,2], [0,3,1,2], [0,3,1,2], [0,0,0,0]]
+        
+        print "Lane keep start!"
+        
+        cur_state = 0
+        
+        while self.automode:
+            if cur_state == 0:
+                self.display.show(1, "FORWARD")
+                self.PWM.slowforward()
+                ultra.look_forward()
+            elif cur_state == 1:
+                self.display.show(1, "TURNLEFT")
+                self.PWM.setMotorModel(-1000, -1000, 1500, 1500)
+            elif cur_state == 2:
+                self.display.show(1, "TURNRITE")
+                self.PWM.setMotorModel(1500, 1500, -1000, -1000)
+            else:
+                print "WALL!"
+                self.automode = false
+
+            time.sleep(0.1)
+            d = ultra.get_distance()
+            self.LMR = 0x00
+            if GPIO.input(IR01) == False:
+                self.LMR = (self.LMR | 4)
+            if GPIO.input(IR02) == False:
+                self.LMR = (self.LMR | 2)
+            if GPIO.input(IR03) == False:
+                self.LMR = (self.LMR | 1)
+
+            e = 0
+            
+            if d < x:
+                e = 1
+            elif self.LMR == 4 or self.LMR == 6:
+                e = 2
+            elif self.LMR == 1 or self.LMR == 3:
+                e = 3
+            
+            cur_state = ttable[cur_state][e]
+            print("LMR: " + self.LMR + " Cur state: " + cur_state)
+            
+            
+        print "Lane keep End!"
             
     def run_line(self):
         IR01 = 14
@@ -481,6 +549,10 @@ if __name__ == '__main__':
                             display.show(1, "LITEMODE")
                             time.sleep(3)
                             myshow.run_light_thread()
+                        elif event.code == STARTLANE:
+                            display.show(1, "LANEMODE")
+                            time.sleep(3)
+                            myshow.run_lane_thread()
                         elif event.code == DANCE:
                             display.show(1, "DANCE")
                             myshow.run_dance_thread()
