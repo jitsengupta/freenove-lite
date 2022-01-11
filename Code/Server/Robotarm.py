@@ -1,8 +1,7 @@
 import time
-from builtins import dict
+from threading import Thread
+from Thread import *
 from servo import Servo
-from scipy.weave.examples.vtk_example import inc_dirs
-from Carbon.Aliases import false
 
 CLAWMIN = 50
 CLAWMAX = 90
@@ -23,17 +22,18 @@ DEFREACHPOS = 90
 DEFARMPOS = 85
 DEFTURNPOS = 100
 
-defaultangles = dict(TURNSERVO=DEFTURNPOS, ARMSERVO=DEFARMPOS, REACHSERVO=DEFREACHPOS, CLAWSERVO=DEFCLAWPOS)
-currentangles = defaultangles
-minangles = dict(TURNSERVO=TURNMIN, ARMSERVO=ARMMIN, REACHSERVO=REACHMIN, CLAWSERVO=CLAWMIN)
-maxangles = dict(TURNSERVO=TURNMAX, ARMSERVO=ARMMAX, REACHSERVO=REACHMAX, CLAWSERVO=CLAWMAX)
+defaultangles = {TURNSERVO:DEFTURNPOS, ARMSERVO:DEFARMPOS, REACHSERVO:DEFREACHPOS, CLAWSERVO:DEFCLAWPOS}
+currentangles = {TURNSERVO:DEFTURNPOS, ARMSERVO:DEFARMPOS, REACHSERVO:DEFREACHPOS, CLAWSERVO:DEFCLAWPOS}
+minangles = {TURNSERVO:TURNMIN, ARMSERVO:ARMMIN, REACHSERVO:REACHMIN, CLAWSERVO:CLAWMIN}
+maxangles = {TURNSERVO:TURNMAX, ARMSERVO:ARMMAX, REACHSERVO:REACHMAX, CLAWSERVO:CLAWMAX}
 
 class Robotarm:
     def __init__(self, servo):
         self.servo = servo
         for x in currentangles.keys():
             self.servo.setServoPwm(x, currentangles.get(x))
-        self.moving = false
+        self.moving = False
+	self.servo_thread = None
         
     def up(self, by=2, delay=0.1):
         self.start_servo_thread(ARMSERVO, by, delay)
@@ -73,21 +73,22 @@ class Robotarm:
     def start_servo_thread(self, channel, inc, delay):
         if self.servo_thread or self.moving:
             self.stop_servo_thread()
-            
+        self.moving = True    
         self.servo_thread = Thread(target=self.run_servo_thread, args=(channel, inc, delay))
-        self.scroll_thread.start()   
+        self.servo_thread.start()   
 
     def stop_servo_thread(self):
-        self.moving = false
+        self.moving = False
         if self.servo_thread:
             stop_thread(self.servo_thread)
             self.servo_thread = None   
         
     def run_servo_thread(self, channel, inc, delay):
-        curpos = currentangles[channel]
-        minpos = minangles[channel]
-        maxpos = maxangles[channel] 
+        curpos = currentangles.get(channel)
+        minpos = minangles.get(channel)
+        maxpos = maxangles.get(channel) 
         while(self.moving and curpos >= minpos and curpos <= maxpos):
+		print("Channel:" + channel + " curpos " + str(curpos)) 
                 curpos = curpos + inc
                 self.servo.setServoPwm(channel, curpos)
                 currentangles[channel] = curpos               
