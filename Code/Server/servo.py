@@ -10,6 +10,8 @@ class Servo:
         self.PwmServo.setServoPulse(11,1500)
         self.PwmServo.setServoPulse(12,1500)
         self.PwmServo.setServoPulse(13,1500)
+        self.PwmServo.setServoPulse(14,1500)
+        self.PwmServo.setServoPulse(15,1500)
     def setServoPwm(self,channel,angle,error=10):
         angle=int(angle)
         if channel=='0':
@@ -31,10 +33,13 @@ class Servo:
 
 # Main program logic follows:
 if __name__ == '__main__':
-    pwm=Servo()
+    pwm = Servo()
     for times in range(1,5):
-        pwm.setServoPwm('3',20)
-	time.sleep(2)
-        pwm.setServoPwm('3',150)
-	time.sleep(2)
-    pwm.setServoPwm('3',90) 
+        for a in range(45,90,2):
+            pwm.setServoPwm('7',a)
+            time.sleep(0.05)
+        for b in range(90,45,-2):
+            pwm.setServoPwm('7',b)
+            time.sleep(0.05)
+	time.sleep(1)
+    pwm.setServoPwm('7',60) 

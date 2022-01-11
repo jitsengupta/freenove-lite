@@ -19,35 +19,53 @@ from Buzzer import *
 from Ultrasonic import *
 from ADC import *
 from servo import *
+from Robotarm import Robotarm
 from gpiozero import LED
 from Led import Led
 from TailLight import TailLight
 from SevenSegDisplay import SevenSegDisplay
 
+# Rear arm channels
 ARM = '2'
 HAND = '3'
-SPACE = 57
-OK = 28
-LEFT = 105
-RIGHT = 106
-UP = 103
-DOWN = 108
-VUP = 115
-VDOWN = 114
-PLAY = 164
-PREV = 165
-NEXT = 163
-CONFIG = 171
+
+# special keys
 ESCAPE = 1
-DANCE = 32  # D
+OK = 28
+
+# movement and function keys
+THROW = 20   # T
 STARTAUTO = 22  # U
 STARTLINE = 23  # I
-STARTLIGHT = 38 # L
-STARTLANE = 30 # A?
-THROW = 20   # T
+STARTLANE = 30 # A
 SHAKE = 31   # S
+DANCE = 32  # D
 HIFIVE = 35  # H
+STARTLIGHT = 38 # L
 
+ARMUP = 36
+ARMDOWN = 37
+REACHFORWARD = 39
+REACHBACK = 40
+CLAWOPEN = 41
+CLAWCLOSE = 42
+ARMLEFT = 43
+ARMRIGHT = 44
+
+# Additional special keys
+SPACE = 57
+UP = 103
+LEFT = 105
+RIGHT = 106
+DOWN = 108
+VDOWN = 114
+VUP = 115
+NEXT = 163
+PLAY = 164
+PREV = 165
+CONFIG = 171
+
+# Rear arm values
 ARMSTART = 150 
 ARMEND = 35
 SHAKESTART = 130
@@ -58,6 +76,7 @@ HIFIVEEND = 130
 HANDSTART = 25 
 HANDEND = 120
 
+# Digital pin values
 HEADLIGHTPIN = 16
 LEFTGREENPIN = 21
 RIGHTGREENPIN = 21
@@ -89,6 +108,7 @@ class myapp():
         self.led = Led()
         self.buzzer = buzzer
         self.myservo = Servo()
+        self.robotarm = Robotarm(self.myservo)
         self.display = display
         print "Initializing..."
         self.on_pushButton()
@@ -99,6 +119,7 @@ class myapp():
            stop_thread(self.SendVideo)
            stop_thread(self.ReadData)
            stop_thread(self.power)
+           self.robotarm.stop()
         except:
             pass
         try:
@@ -445,8 +466,9 @@ if __name__ == '__main__':
                     if event.value == 0:  # release stop
                         if event.code != 57:
                             if PWM.moving and not(myshow.automode):
-			    	PWM.stopMotor()  # This will turn on the taillight
+                                PWM.stopMotor()  # This will turn on the taillight
                             	display.show(1, "Stop")
+                            myshow.robotarm.stop()
                             buzzer.run('0')
                             sdcount = 0
                     elif event.value == 1:  # press - start
@@ -468,6 +490,30 @@ if __name__ == '__main__':
                         elif event.code == OK:
                             buzzer.run('1') 
                             display.show(1, "Horn!")
+                        elif event.code == ARMLEFT:
+                            myshow.robotarm.left() 
+                            display.show(1, "ARM LEFT")
+                        elif event.code == ARMRIGHT:
+                            myshow.robotarm.right() 
+                            display.show(1, "ARM RITE")
+                        elif event.code == CLAWOPEN:
+                            myshow.robotarm.open() 
+                            display.show(1, "CLAW OPN")
+                        elif event.code == CLAWCLOSE:
+                            myshow.robotarm.close() 
+                            display.show(1, "CLAW CLS")
+                        elif event.code == ARMUP:
+                            myshow.robotarm.up() 
+                            display.show(1, "ARM UP")
+                        elif event.code == ARMDOWN:
+                            myshow.robotarm.down() 
+                            display.show(1, "ARM DOWN")
+                        elif event.code == REACHBACK:
+                            myshow.robotarm.back() 
+                            display.show(1, "ARM BACK")
+                        elif event.code == REACHFORWARD:
+                            myshow.robotarm.front() 
+                            display.show(1, "ARM FWD")
                         elif event.code == VUP:
                             display.show(1, "Arm up")
                             if curarmangle <= ARMSTART - 5:
