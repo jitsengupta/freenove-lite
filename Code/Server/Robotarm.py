@@ -93,6 +93,8 @@ class Robotarm:
                 self.servo.setServoPwm(channel, curpos)
                 currentangles[channel] = curpos               
                 time.sleep(delay)
+	self.servo_thread = None
+	self.moving = False
                 
         
 # Main program logic follows:
