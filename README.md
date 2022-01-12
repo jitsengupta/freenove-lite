@@ -4,46 +4,20 @@
 
 <img src='Picture/icon.png' width='30%'/>
 
-### Download
+This repository is a reduced version of the original Freenove 4WD smart car code, originally posted at
 
-* **Use command in console**
+https://github.com/Freenove/Freenove_4WD_Smart_Car_Kit_for_Raspberry_Pi
 
-	Run following command to download all the files in this repository.
+and additional updates and ports by @amdroid0007, at
 
-	`git clone https://github.com/Freenove/Freenove_4WD_Smart_Car_Kit_for_Raspberry_Pi.git`
+https://github.com/amdroid007/freenove
 
-* **Manually download in browser**
+I am rebuilding this as a reduced set of server-side code that a beginner Python programmer can access and 
+use to use code to make the robot perform tasks such as forward, backward, turn, lights, LED show, buzzer
 
-	Click the green "Clone or download" button, then click "Download ZIP" button in the pop-up window.
-	Do NOT click the "Open in Desktop" button, it will lead you to install Github software.
+and with amdroid007's upgrades, use the robotarm, headlight, taillight extensions to perform additional tasks.
 
-> If you meet any difficulties, please contact our support team for help.
-
-### Support
-
-Freenove provides free and quick customer support. Including but not limited to:
-
-* Quality problems of products
-* Using Problems of products
-* Questions of learning and creation
-* Opinions and suggestions
-* Ideas and thoughts
-
-Please send an email to:
-
-[support@freenove.com](mailto:support@freenove.com)
-
-We will reply to you within one working day.
-
-### Purchase
-
-Please visit the following page to purchase our products:
-
-http://store.freenove.com
-
-Business customers please contact us through the following email address:
-
-[sale@freenove.com](mailto:sale@freenove.com)
+Please see original copyright below. Create Commons non-commercial sharing only.
 
 ### Copyright
 
