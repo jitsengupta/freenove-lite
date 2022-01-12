@@ -38,10 +38,10 @@ THROW = 20   # T
 STARTAUTO = 22  # U
 STARTLINE = 23  # I
 STARTLANE = 30 # A
-SHAKE = 0   # S have to change
+SHAKE = 16   # Q = shaq?
 DANCE = 32  # D
 HIFIVE = 35  # H
-STARTLIGHT = 0 # L have to change
+STARTLIGHT = 24  # O = optical
 
 ARMUP = 31      # S = 31
 ARMDOWN = 45    # X = 45

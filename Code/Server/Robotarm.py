@@ -3,21 +3,21 @@ from threading import Thread
 from Thread import *
 from servo import Servo
 
-CLAWMIN = 50
+CLAWMIN = 55
 CLAWMAX = 90
 TURNMIN = 30
 TURNMAX = 170
 REACHMIN = 30
 REACHMAX = 150
-ARMMIN = 50
-ARMMAX = 120
+ARMMIN = 40
+ARMMAX = 130
 
 TURNSERVO = '4'
 ARMSERVO = '5'
 REACHSERVO = '6'
 CLAWSERVO = '7'
 
-DEFCLAWPOS = 50
+DEFCLAWPOS = 90 
 DEFREACHPOS = 90
 DEFARMPOS = 85
 DEFTURNPOS = 100
@@ -35,27 +35,27 @@ class Robotarm:
         self.moving = False
 	self.servo_thread = None
         
-    def up(self, by=2, delay=0.1):
+    def up(self, by=2, delay=0.05):
         self.start_servo_thread(ARMSERVO, by, delay)
         pass
     
-    def down(self, by=2, delay=0.1):
+    def down(self, by=2, delay=0.05):
         self.start_servo_thread(ARMSERVO, by * -1, delay)
         pass
     
-    def left(self, by=2, delay=0.1):
-        self.start_servo_thread(TURNSERVO, by * -1, delay)
-        pass
-    
-    def right(self, by=2, delay=0.1):
+    def left(self, by=3, delay=0.05):
         self.start_servo_thread(TURNSERVO, by, delay)
         pass
     
-    def front(self, by=2, delay=0.1):
+    def right(self, by=3, delay=0.05):
+        self.start_servo_thread(TURNSERVO, by * -1, delay)
+        pass
+    
+    def front(self, by=2, delay=0.05):
         self.start_servo_thread(REACHSERVO, by, delay)
         pass
     
-    def back(self, by=2, delay=0.1):
+    def back(self, by=2, delay=0.05):
         self.start_servo_thread(REACHSERVO, by * -1, delay)
         pass
     
