@@ -38,19 +38,19 @@ THROW = 20   # T
 STARTAUTO = 22  # U
 STARTLINE = 23  # I
 STARTLANE = 30 # A
-SHAKE = 31   # S
+SHAKE = 0   # S have to change
 DANCE = 32  # D
 HIFIVE = 35  # H
-STARTLIGHT = 38 # L
+STARTLIGHT = 0 # L have to change
 
-ARMUP = 36
-ARMDOWN = 37
-REACHFORWARD = 39
-REACHBACK = 40
-CLAWOPEN = 41
-CLAWCLOSE = 42
-ARMLEFT = 43
-ARMRIGHT = 44
+ARMUP = 31      # S = 31
+ARMDOWN = 45    # X = 45
+REACHFORWARD = 38  # L = 38
+REACHBACK = 52  # . = 52
+CLAWOPEN = 44   # Z = 44
+CLAWCLOSE = 46  # C = 46
+ARMLEFT = 51    # , = 51
+ARMRIGHT = 39   # ; = 39?
 
 # Additional special keys
 SPACE = 57
