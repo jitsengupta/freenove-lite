@@ -90,6 +90,9 @@ class Robotarm:
         while(self.moving and curpos >= minpos and curpos <= maxpos):
 		print("Channel:" + channel + " curpos " + str(curpos)) 
                 curpos = curpos + inc
+                curpos = curpos if curpos <= maxpos else maxpos
+                curpos = curpos if curpos >= minpos else minpos
+                
                 self.servo.setServoPwm(channel, curpos)
                 currentangles[channel] = curpos               
                 time.sleep(delay)
