@@ -216,10 +216,12 @@ class myapp():
                 self.display.show(1, "LOOKLEFT")
                 self.PWM.stopMotor()
                 ultra.look_left()
+		time.sleep(0.2)
             elif cur_state == 2:
                 self.display.show(1, "LOOKRITE")
                 self.PWM.stopMotor()
                 ultra.look_right()
+		time.sleep(0.2)
             elif cur_state == 3:
                 self.display.show(1, "GOBACK")
                 self.PWM.backup()
@@ -244,7 +246,7 @@ class myapp():
                 self.LMR = (self.LMR | 2)
             if GPIO.input(IR03) == False:
                 self.LMR = (self.LMR | 1)
-            if (self.LMR <> self.LMR0):
+            if (False and self.LMR <> self.LMR0):  # disabling this temporarily
                 cur_state = 3
 	    else:
                 e = 0 if d < x else 1
